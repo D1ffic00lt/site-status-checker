@@ -3,5 +3,4 @@ class Checker(object):
         pass
 
     def __repr__(self):
-        return "{0}()".format(self.__module__)
-    
+        return "Checker()"
