@@ -5,16 +5,29 @@ import pandas as pd
 class ReadObject(object):
     def __init__(self, host: str, ports: str):
         self.host = host
-        self.ports = ports
+        self._ports = ports
 
     def get_request_type(self):
         pass
 
+    @property
+    def ports(self):
+        if self._ports == "nan":
+            return None
+        result = []
+        for port in self._ports.split(","):
+            if port.isdigit():
+                if float(port) == int(port):
+                    result.append(int(port))
+                else:
+                    return AttributeError("Port must be int")
+            else:
+                return AttributeError("Port must be digit")
+
+        return result
+
     def __repr__(self) -> str:
         return "ReadObject({0}, {1})".format(self.host, self.ports)
-
-    def __call__(self) -> list:
-        return []
 
 
 class CSVReader(object):
