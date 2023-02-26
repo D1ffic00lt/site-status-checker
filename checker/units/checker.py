@@ -2,6 +2,7 @@ import re
 import socket
 import requests
 
+from ping3 import ping
 from datetime import datetime
 
 from exceptions import IgnoreInternetExceptions
@@ -65,15 +66,17 @@ class Checker(object):
 
             if self.data.ports is None:
                 return [host_display_name, host_ip, self.data.ports], \
-                    "{0} | {1} | {2} | {3} | {4} ms | -1 | ???".format(
-                    datetime.now(), host_display_name, host_ip, 0.0, "ping"
+                    "{0} | {1} | {2} | {3} | {4:.3} ms | -1 | ???".format(
+                    datetime.now(), host_display_name, host_ip, 0.0,
+                        ping(host_ip, timeout=1000, unit="ms")
                 )
             else:
                 result = ""
                 for ip in host_ip:
                     for port in self.data.ports:
-                        result += "{0} | {1} | {2} | 0.0 | {3} | {4} | {5}\n".format(
-                            datetime.now(), host_display_name, ip, "ping", port,
+                        result += "{0} | {1} | {2} | 0.0 | {3:.3} ms | {4} | {5}\n".format(
+                            datetime.now(), host_display_name, ip,
+                            ping(ip, timeout=1000, unit="ms"), port,
                             "Opened" if self.check_port(ip, port) else "Not opened"
                         )
                 return result
