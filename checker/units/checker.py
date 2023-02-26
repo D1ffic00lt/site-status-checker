@@ -48,7 +48,7 @@ class Checker(object):
                     return "ip is not success"
                 if not self.check_port(ip, 443) or not self.check_port(ip, 80):
                     return "HTTPS or HTT ports closed"
-                if self.get_ip_success(ip).status_code % 100 not in [1, 2, 3]:
+                if self.get_ip_success(ip).status_code // 100 not in [1, 2, 3]:
                     return "bad request code ({0})".format(self.get_ip_success(ip).status_code)
             else:
                 if not self.check_port(self.data.host, 443) or not self.check_port(self.data.host, 80):
@@ -57,7 +57,7 @@ class Checker(object):
                     return "cant get ip from the host ({0})".format(self.data.host)
                 if not self.get_ip_success(self.data.host):
                     return "ip is not success"
-                if self.get_ip_success(self.data.host).status_code % 100 not in [1, 2, 3]:
+                if self.get_ip_success(self.data.host).status_code // 100 not in [1, 2, 3]:
                     return "bad request code ({0})".format(self.get_ip_success(self.data.host).status_code)
 
             host_display_name = "???" if is_ip else self.data.host
@@ -67,9 +67,9 @@ class Checker(object):
             if self.data.ports is None:
                 return [host_display_name, host_ip, self.data.ports], \
                     "{0} | {1} | {2} | {3} | {4:.3} ms | -1 | ???".format(
-                    datetime.now(), host_display_name, host_ip, 0.0,
+                        datetime.now(), host_display_name, host_ip, 0.0,
                         ping(host_ip, timeout=1000, unit="ms")
-                )
+                    )
             else:
                 result = ""
                 for ip in host_ip:
@@ -80,3 +80,7 @@ class Checker(object):
                             "Opened" if self.check_port(ip, port) else "Not opened"
                         )
                 return result
+
+
+if __name__ == "__main__":
+    print(Checker(ReadObject("last.fm", "80,443"))())
