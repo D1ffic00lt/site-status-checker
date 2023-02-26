@@ -2,6 +2,7 @@ import requests
 
 from functools import wraps
 
+
 class IgnoreInternetExceptions(object):
     def __init__(self):
         pass
@@ -16,4 +17,5 @@ class IgnoreInternetExceptions(object):
                 return func(*args, **kwargs)
             except requests.exceptions.ConnectionError:
                 return "ConnectionError"
+
         return decorator
