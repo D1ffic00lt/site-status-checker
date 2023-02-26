@@ -1,14 +1,13 @@
-from typing import List
-
 from reader import CSVReader
 
 
 class Checker(object):
-    def __init__(self):
-        self.data: List[CSVReader] = []
-
-    def load(self, reader: CSVReader):
-        self.data.append(reader)
+    def __init__(self, data: CSVReader):
+        self.data: CSVReader = data
 
     def __repr__(self):
-        return "Checker()"
+        return "Checker({0})".format(repr(self.data))
+
+    def __call__(self):
+        if self.data.input_error_status:
+            return Exception("Error")
