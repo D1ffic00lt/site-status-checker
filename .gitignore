@@ -3,3 +3,4 @@
 *.vsconfig
 *.log
 *.csv
+*__pycache__/

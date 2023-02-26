@@ -4,8 +4,8 @@ from functools import wraps
 
 
 class IgnoreInternetExceptions(object):
-    def __init__(self):
-        pass
+    def __init__(self, check_ip: bool = False):
+        self.check_ip = check_ip
 
     def __repr__(self):
         return "IgnoreInternetExceptions()"
@@ -14,8 +14,13 @@ class IgnoreInternetExceptions(object):
         @wraps(func)
         def decorator(*args, **kwargs):
             try:
-                return func(*args, **kwargs)
+                result = func(*args, **kwargs)
+                if self.check_ip:
+                    return True
+                return result
             except requests.exceptions.ConnectionError:
+                if self.check_ip:
+                    return False
                 return "ConnectionError"
 
         return decorator
