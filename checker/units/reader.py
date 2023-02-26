@@ -40,8 +40,9 @@ class CSVReader(object):
                     ports = None
                 if host == "nan":
                     host = None
-                if not ports.isdigit():
+                if not ports.isdigit() and ports != "nan":
                     self.input_error_status = True
+                    continue
                 values.append(ReadObject(host, ports))
             return values
         return []
