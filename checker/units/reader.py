@@ -10,9 +10,6 @@ class ReadObject(object):
         self._ports = ports
         self._results = []
 
-    def get_request_type(self):
-        pass
-
     @property
     def ports(self):
         if self._results:

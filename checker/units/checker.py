@@ -1,13 +1,14 @@
-from reader import CSVReader
+from exceptions import IgnoreInternetExceptions
+from reader import ReadObject
 
 
 class Checker(object):
-    def __init__(self, data: CSVReader):
-        self.data: CSVReader = data
+    def __init__(self, data: ReadObject):
+        self.data: ReadObject = data
 
     def __repr__(self):
         return "Checker({0})".format(repr(self.data))
 
+    @IgnoreInternetExceptions()
     def __call__(self):
-        if self.data.input_error_status:
-            return Exception("Error")
+        pass
