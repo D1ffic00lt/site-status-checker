@@ -8,11 +8,13 @@ class ReadObject(object):
     def __init__(self, host: str, ports: Union[str, None]):
         self.host = host
         self._ports = ports
+        if ports == "":
+            self._ports = ""
         self._results = []
 
     @property
     def ports(self):
-        if self._results:
+        if self._results or self._ports == "":
             return self._results
         self._results = [int(port) for port in self._ports.split(",")]
         return self._results
@@ -36,9 +38,9 @@ class CSVReader(object):
             data = pd.read_csv(self.filename, sep=";")
             values = []
             for host, ports in data.values.tolist():
-                if ports == "nan":
+                if ports in ["nan", "", []]:
                     ports = None
-                if host == "nan":
+                if host in ["nan", "", []]:
                     host = None
                 if not ports.isdigit() and ports != "nan":
                     self.input_error_status = True
