@@ -27,7 +27,7 @@ class Checker(object):
         socket_connection = socket.socket()
         try:
             socket_connection.connect((host, port))
-        except (socket.gaierror, ConnectionRefusedError):
+        except (socket.gaierror, ConnectionRefusedError, TimeoutError):
             return False
         return True
 
@@ -84,4 +84,4 @@ class Checker(object):
 
 
 if __name__ == "__main__":
-    print(Checker(ReadObject("localhost", ""))())
+    print(Checker(ReadObject("ods.ai", "443"))())
