@@ -14,9 +14,6 @@ class Checker(object):
     def __init__(self, data: ReadObject):
         self.data: ReadObject = data
 
-    def __repr__(self):
-        return "Checker({0})".format(repr(self.data))
-
     @staticmethod
     @IgnoreInternetExceptions(check_ip=True)
     def get_ip_success(ip: str) -> requests.models.Response:
@@ -78,9 +75,9 @@ class Checker(object):
                     )
             elif self.data.host in ["127.0.0.1", "localhost"] and self.data.ports == []:
                 return "{0} | {1} | {2} | 0.0 | {3:.3} ms | -1 | ???".format(
-                            datetime.now(), host_display_name, host_ip[0],
-                            ping(host_ip[0], timeout=500, unit="ms")
-                        )
+                    datetime.now(), host_display_name, host_ip[0],
+                    ping(host_ip[0], timeout=500, unit="ms")
+                )
             else:
                 result = ""
                 for ip in host_ip:
@@ -93,6 +90,9 @@ class Checker(object):
                 if result[-1:] == "\n":
                     return result[:-1]
                 return result
+
+    def __repr__(self):
+        return "Checker({0})".format(repr(self.data))
 
 
 if __name__ == "__main__":

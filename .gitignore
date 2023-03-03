@@ -1,7 +1,8 @@
 *.idea/
+*__pycache__/
 *.DS_Store
 *.vsconfig
 *.log
 *.csv
-*__pycache__/
+
 checker/units/test.py
