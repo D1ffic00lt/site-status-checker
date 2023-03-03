@@ -25,6 +25,7 @@ class Checker(object):
         )
 
     @staticmethod
+    @IgnoreInternetExceptions()
     def check_port(host: str, port: int):
         socket_connection = socket.socket()
         try:
@@ -34,6 +35,7 @@ class Checker(object):
         return True
 
     @staticmethod
+    @IgnoreInternetExceptions()
     def get_ip_from_host(host: str):
         try:
             return socket.gethostbyname(host)
@@ -41,7 +43,7 @@ class Checker(object):
             return False
 
     @IgnoreInternetExceptions()
-    def __call__(self):
+    def __call__(self):  # FIXME
         if self.data.host is not None:
             is_ip = re.findall(IP, self.data.host) != []
             if is_ip:
@@ -101,4 +103,3 @@ if __name__ == "__main__":
     print(Checker(ReadObject("last.fm", "80,443"))())
     print(Checker(ReadObject("172.16.3.1", "53"))())
     print(Checker(ReadObject("192.168.1.210", "53"))())
-

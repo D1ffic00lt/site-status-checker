@@ -47,7 +47,8 @@ class CSVReader(object):
                     continue
                 values.append(ReadObject(host, ports))
             return values
-        return ""
+        self.input_error_status = True
+        return []
 
     def __repr__(self) -> str:
         return "CSVReader({0})".format(self.filename)
