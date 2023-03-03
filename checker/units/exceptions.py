@@ -16,7 +16,7 @@ class IgnoreInternetExceptions(object):
             try:
                 result = func(*args, **kwargs)
                 return result
-            except requests.exceptions.ConnectionError:
+            except requests.exceptions.ConnectionError as ex:
                 if self.check_ip:
                     return False
                 return "ConnectionError"
