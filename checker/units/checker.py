@@ -20,9 +20,12 @@ class Checker(object):
     @staticmethod
     @IgnoreInternetExceptions(check_ip=True)
     def get_ip_success(ip: str) -> requests.models.Response:
-        return requests.get(f"http://{ip}" if "http" not in ip else ip, timeout=10)
+        return requests.get(
+            f"http://{ip}" if "http" not in ip else ip, timeout=10
+        )
 
     @staticmethod
+    @IgnoreInternetExceptions()
     def check_port(host: str, port: int):
         socket_connection = socket.socket()
         try:
@@ -32,6 +35,7 @@ class Checker(object):
         return True
 
     @staticmethod
+    @IgnoreInternetExceptions()
     def get_ip_from_host(host: str):
         try:
             return socket.gethostbyname(host)
@@ -39,7 +43,7 @@ class Checker(object):
             return False
 
     @IgnoreInternetExceptions()
-    def __call__(self):
+    def __call__(self):  # FIXME
         if self.data.host is not None:
             is_ip = re.findall(IP, self.data.host) != []
             if is_ip:
@@ -51,15 +55,16 @@ class Checker(object):
                 if self.get_ip_success(ip).status_code // 100 not in [1, 2, 3]:
                     return "bad request code ({0})".format(self.get_ip_success(ip).status_code)
             else:
-                if self.data.ports is not None:
+                if self.data.ports is not None and self.data.host != "localhost":
                     if not self.check_port(self.data.host, 443) or not self.check_port(self.data.host, 80):
                         return "HTTPS or HTT ports closed"
                 if isinstance(self.get_ip_from_host(self.data.host), bool):
                     return "cant get ip from the host ({0})".format(self.data.host)
-                if not self.get_ip_success(self.data.host):
-                    return "ip is not success"
-                if self.get_ip_success(self.data.host).status_code // 100 not in [1, 2, 3]:
-                    return "bad request code ({0})".format(self.get_ip_success(self.data.host).status_code)
+                if self.data.host not in ["127.0.0.1", "localhost"]:
+                    if not self.get_ip_success(self.data.host):
+                        return "ip is not success"
+                    if self.get_ip_success(self.data.host).status_code // 100 not in [1, 2, 3]:
+                        return "bad request code ({0})".format(self.get_ip_success(self.data.host).status_code)
 
             host_display_name = "???" if is_ip else self.data.host
             host_ip = self.get_ip_from_host(self.data.host)
@@ -71,6 +76,11 @@ class Checker(object):
                         datetime.now(), host_display_name, host_ip, 0.0,
                         ping(host_ip, timeout=500, unit="ms")
                     )
+            elif self.data.host in ["127.0.0.1", "localhost"] and self.data.ports == []:
+                return "{0} | {1} | {2} | 0.0 | {3:.3} ms | -1 | ???".format(
+                            datetime.now(), host_display_name, host_ip[0],
+                            ping(host_ip[0], timeout=500, unit="ms")
+                        )
             else:
                 result = ""
                 for ip in host_ip:
@@ -80,8 +90,16 @@ class Checker(object):
                             ping(ip, timeout=500, unit="ms"), port,
                             "Opened" if self.check_port(ip, port) else "Not opened"
                         )
+                if result[-1:] == "\n":
+                    return result[:-1]
                 return result
 
 
 if __name__ == "__main__":
-    print(Checker(ReadObject("ods.ai", "443"))())
+    # print(Checker(ReadObject("ya.ru", "xzx1"))())
+    print(Checker(ReadObject("localhost", ""))())
+    print(Checker(ReadObject("", "80"))())
+    print(Checker(ReadObject("yandex.ru", "443"))())
+    print(Checker(ReadObject("last.fm", "80,443"))())
+    print(Checker(ReadObject("172.16.3.1", "53"))())
+    print(Checker(ReadObject("192.168.1.210", "53"))())

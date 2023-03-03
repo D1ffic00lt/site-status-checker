@@ -8,7 +8,7 @@ class ReadObject(object):
     def __init__(self, host: str, ports: Union[str, None]):
         self.host = host
         self._ports = ports
-        if ports == "":
+        if ports == "" or ports is None:
             self._ports = ""
         self._results = []
 
@@ -47,6 +47,7 @@ class CSVReader(object):
                     continue
                 values.append(ReadObject(host, ports))
             return values
+        self.input_error_status = True
         return []
 
     def __repr__(self) -> str:

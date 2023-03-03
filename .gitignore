@@ -4,3 +4,4 @@
 *.log
 *.csv
 *__pycache__/
+checker/units/test.py
