@@ -5,9 +5,9 @@ import requests
 from ping3 import ping
 from datetime import datetime
 
-from exceptions import IgnoreInternetExceptions, CheckerException
-from reader import ReadObject
-from config import IP
+from checker.units.exceptions import IgnoreInternetExceptions, CheckerException
+from checker.units.reader import ReadObject
+from checker.units.config import IP
 
 
 class Checker(object):
@@ -96,12 +96,3 @@ class Checker(object):
     def __repr__(self):
         return "Checker({0})".format(repr(self.data))
 
-
-if __name__ == "__main__":
-    # print(Checker(ReadObject("ya.ru", "xzx1"))())
-    print(Checker(ReadObject("localhost", ""))())
-    print(Checker(ReadObject("", "80"))())
-    print(Checker(ReadObject("yandex.ru", "443"))())
-    print(Checker(ReadObject("last.fm", "80,443"))())
-    print(Checker(ReadObject("172.16.3.1", "53"))())
-    print(Checker(ReadObject("192.168.1.210", "53"))())

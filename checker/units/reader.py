@@ -38,15 +38,18 @@ class CSVReader(object):
     def read(self):
         if self.get_file_exists_status():
             data = pd.read_csv(self.filename, sep=";")
+            data = data.astype(str)
             values = []
             for host, ports in data.values.tolist():
-                if ports in ["nan", "", []]:
+                if ports in ["nan", "", [], None]:
                     ports = None
-                if host in ["nan", "", []]:
+                if host in ["nan", "", [], None]:
                     host = None
-                if not ports.isdigit() and ports != "nan":
-                    self.input_error_status = CSVReaderException("all ports must be int ()".format(ports))
-                    continue
+                if ports is not None:
+                    if not ports.isdigit() and ports != "nan":
+                        if not all([i.isdigit()for i in ports.split(",")]):
+                            self.input_error_status = CSVReaderException("all ports must be int ()".format(ports))
+                            continue
                 values.append(ReadObject(host, ports))
             return values
         self.input_error_status = CSVReaderException("file {0} not found".format(self.filename))
