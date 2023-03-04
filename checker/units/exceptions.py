@@ -36,6 +36,11 @@ class SSCException(Exception):
         return "{0}({1})".format(self.__class__.__name__, self.message)
 
 
+class CSVReaderException(SSCException):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
 class CheckerException(SSCException):
-    def __init__(self, message):
+    def __init__(self, message: str):
         super().__init__(message)

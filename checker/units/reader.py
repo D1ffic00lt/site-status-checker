@@ -3,6 +3,8 @@ import pandas as pd
 
 from typing import Union
 
+from checker.units.exceptions import CSVReaderException
+
 
 class ReadObject(object):
     def __init__(self, host: str, ports: Union[str, None]):
@@ -43,11 +45,11 @@ class CSVReader(object):
                 if host in ["nan", "", []]:
                     host = None
                 if not ports.isdigit() and ports != "nan":
-                    self.input_error_status = True
+                    self.input_error_status = CSVReaderException("all ports must be int ()".format(ports))
                     continue
                 values.append(ReadObject(host, ports))
             return values
-        self.input_error_status = True
+        self.input_error_status = CSVReaderException("file {0} not found".format(self.filename))
         return []
 
     def __repr__(self) -> str:

@@ -5,8 +5,8 @@ from units.exceptions import SSCException
 
 
 class SiteStatusChecker(object):
-    def __init__(self, data: Union[CSVReader, None] = None):
-        self._data: List[Union[CSVReader, None]] = [data]
+    def __init__(self, data: CSVReader):
+        self._data: List[Union[CSVReader]] = [data]
 
     @property
     def data(self):
@@ -18,7 +18,7 @@ class SiteStatusChecker(object):
 
     @staticmethod
     def error_checker(value):
-        if issubclass(type(value), SSCException):
+        if issubclass(value, SSCException):
             return True
         return False
 
