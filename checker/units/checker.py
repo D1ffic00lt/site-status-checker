@@ -1,6 +1,8 @@
 import re
 import socket
 import requests
+import urllib.error
+import urllib.request
 
 from ping3 import ping
 from datetime import datetime
@@ -22,7 +24,14 @@ class Checker(object):
         )
 
     @staticmethod
-    @IgnoreInternetExceptions()
+    def get_status_code(url):
+        try:
+            conn = urllib.request.urlopen(f"http://{url}" if "http" not in url else url)
+        except urllib.error.HTTPError as ex:
+            conn = ex
+        return conn.getcode()
+
+    @staticmethod
     def check_port(host: str, port: int):
         socket_connection = socket.socket()
         socket_connection.settimeout(10)
@@ -33,15 +42,15 @@ class Checker(object):
         return True
 
     @staticmethod
-    @IgnoreInternetExceptions()
     def get_ip_from_host(host: str):
         try:
             return socket.gethostbyname(host)
         except socket.gaierror:
             return False
 
-    @IgnoreInternetExceptions()
-    def __call__(self):  # FIXME
+    def __call__(self):
+        # FIXME
+        # TODO get cite name
         if self.data.host is not None:
             is_ip = re.findall(IP, self.data.host) != []
             if is_ip:
@@ -50,21 +59,21 @@ class Checker(object):
                     return CheckerException("ip is not success")
                 if not self.check_port(ip, 443) or not self.check_port(ip, 80):
                     return CheckerException("HTTPS or HTT ports closed")
-                if self.get_ip_success(ip).status_code // 100 not in [1, 2, 3]:
+                if self.get_status_code(ip) // 100 not in [1, 2, 3]:
                     return CheckerException("bad request code ({0})".format(self.get_ip_success(ip).status_code))
             else:
                 if self.data.ports is not None and self.data.host != "localhost":
                     if not self.check_port(self.data.host, 443) or not self.check_port(self.data.host, 80):
                         return CheckerException("HTTPS or HTT ports closed")
                 if isinstance(self.get_ip_from_host(self.data.host), bool):
-                    return CheckerException("cant get ip from the host ({0})".format(self.data.host))
+                    return CheckerException("can't get ip from the host ({0})".format(self.data.host))
                 if self.data.host not in ["127.0.0.1", "localhost"]:
                     if not self.get_ip_success(self.data.host):
                         return CheckerException("ip is not success")
-                    if self.get_ip_success(self.data.host).status_code // 100 not in [1, 2, 3]:
-                        return CheckerException(
-                            "bad request code ({0})".format(self.get_ip_success(self.data.host).status_code)
-                        )
+                if self.get_status_code(self.data.host) // 100 not in [1, 2, 3]:
+                    return CheckerException(
+                        "bad request code ({0})".format(self.get_ip_success(self.data.host).status_code)
+                    )
 
             host_display_name = "???" if is_ip else self.data.host
             host_ip = self.get_ip_from_host(self.data.host)

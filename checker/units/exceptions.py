@@ -1,5 +1,6 @@
 import requests
 
+from time import sleep
 from functools import wraps
 
 
@@ -19,6 +20,7 @@ class IgnoreInternetExceptions(object):
             except requests.exceptions.ConnectionError:
                 if self.check_ip:
                     return False
+                sleep(10)
                 return "ConnectionError"
 
         return decorator
