@@ -47,7 +47,7 @@ class CSVReader(object):
                     host = None
                 if ports is not None:
                     if not ports.isdigit() and ports != "nan":
-                        if not all([i.isdigit()for i in ports.split(",")]):
+                        if not all([i.isdigit() for i in ports.split(",")]):
                             self.input_error_status = CSVReaderException("all ports must be int ()".format(ports))
                             continue
                 values.append(ReadObject(host, ports))

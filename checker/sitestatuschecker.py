@@ -1,22 +1,14 @@
-from typing import Union, List
-from checker.units.reader import CSVReader
 from checker.units.checker import Checker
-from checker.units.exceptions import SSCException
+from checker.units.exceptions import SSCException, IgnoreInternetExceptions
+from checker.units.reader import CSVReader
 
 
-class SiteStatusChecker(object):
+class SiteStatusChecker(CSVReader):
     IGNORE_ERRORS: bool = False
+    YIELD_ERRORS: bool = False
 
-    def __init__(self, data: CSVReader):
-        self._data: List[Union[CSVReader]] = [data]
-
-    @property
-    def data(self):
-        return self._data
-
-    @data.setter
-    def data(self, value: CSVReader):
-        self._data.append(value)
+    def __init__(self, filename: str):
+        self.data = super().__init__(filename)
 
     @staticmethod
     def error_checker(value):
@@ -24,23 +16,28 @@ class SiteStatusChecker(object):
             return True
         return False
 
+    @IgnoreInternetExceptions()
     def __call__(self):
-        for reader in self.data:
-            if self.error_checker(reader.input_error_status) and not self.IGNORE_ERRORS:
-                yield str(reader.input_error_status)
-                return
-            for read_object in reader():
-                worker = Checker(read_object)()
-                if self.error_checker(worker):
-                    yield worker
-                    if not self.IGNORE_ERRORS:
-                        return
-                if worker is not None:
-                    yield worker
+        for reader in super().__call__():
+            if self.error_checker(self.input_error_status):
+                if not self.IGNORE_ERRORS:
+                    yield str(self.input_error_status)
+                    return
+                if not self.YIELD_ERRORS:
+                    yield str(self.input_error_status)
+            worker = Checker(reader)()
+            if self.error_checker(worker):
+                if not self.IGNORE_ERRORS:
+                    yield str(worker)
+                    return
+                if not self.YIELD_ERRORS:
+                    yield str(worker)
+                continue
+            if worker is not None:
+                yield worker
 
     def __str__(self):
-        return "[{0}]".format(", ".join([str(obj) for obj in self._data]))
+        return "[{0}]".format(", ".join([str(obj) for obj in self.units]))
 
     def __repr__(self):
         return "{0}()".format(self.__class__.__name__)
-
