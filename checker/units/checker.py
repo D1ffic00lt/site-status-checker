@@ -28,10 +28,7 @@ class Checker(object):
         socket_connection.settimeout(10)
         try:
             socket_connection.connect((host, port))
-        except (
-                socket.gaierror, socket.timeout,
-                ConnectionRefusedError, TimeoutError
-        ):
+        except (socket.gaierror, socket.timeout, ConnectionRefusedError, TimeoutError):
             return False
         return True
 
@@ -99,4 +96,3 @@ class Checker(object):
 
     def __repr__(self):
         return "Checker({0})".format(repr(self.data))
-

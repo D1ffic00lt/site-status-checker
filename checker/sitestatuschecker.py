@@ -44,9 +44,3 @@ class SiteStatusChecker(object):
     def __repr__(self):
         return "{0}()".format(self.__class__.__name__)
 
-
-if __name__ == "__main__":
-    checker_ = SiteStatusChecker(CSVReader("units/test.csv"))
-    checker_.IGNORE_ERRORS = True
-    for i in checker_():
-        print(i)
