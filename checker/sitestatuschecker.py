@@ -5,6 +5,7 @@ from checker.units.reader import CSVReader
 
 class SiteStatusChecker(CSVReader):
     IGNORE_ERRORS: bool = False
+    YIELD_ERRORS: bool = False
 
     def __init__(self, filename: str):
         self.data = super().__init__(filename)
@@ -18,14 +19,19 @@ class SiteStatusChecker(CSVReader):
     @IgnoreInternetExceptions()
     def __call__(self):
         for reader in super().__call__():
-            if self.error_checker(self.input_error_status) and not self.IGNORE_ERRORS:
-                yield str(self.input_error_status)
-                return
+            if self.error_checker(self.input_error_status):
+                if not self.IGNORE_ERRORS:
+                    yield str(self.input_error_status)
+                    return
+                if not self.YIELD_ERRORS:
+                    yield str(self.input_error_status)
             worker = Checker(reader)()
             if self.error_checker(worker):
                 if not self.IGNORE_ERRORS:
-                    yield worker
+                    yield str(worker)
                     return
+                if not self.YIELD_ERRORS:
+                    yield str(worker)
                 continue
             if worker is not None:
                 yield worker
@@ -35,13 +41,3 @@ class SiteStatusChecker(CSVReader):
 
     def __repr__(self):
         return "{0}()".format(self.__class__.__name__)
-
-
-if __name__ == "__main__":
-    while True:
-        print(1)
-        checker_ = SiteStatusChecker("units/test.csv")
-        checker_.IGNORE_ERRORS = True
-        for i in checker_():
-            print(i)
-        print(2)

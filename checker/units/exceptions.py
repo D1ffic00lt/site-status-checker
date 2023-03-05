@@ -19,7 +19,7 @@ class IgnoreInternetExceptions(object):
                 return result
             except requests.exceptions.ConnectionError:
                 if self.check_ip:
-                    return False
+                    return "False 123"
                 sleep(10)
                 return "ConnectionError"
 
