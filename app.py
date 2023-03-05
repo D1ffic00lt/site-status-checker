@@ -1,14 +1,13 @@
-import time
+import requests
 
 from checker.sitestatuschecker import SiteStatusChecker
 
 if __name__ == "__main__":
-    while True:
-        print(1)
-        checker_ = SiteStatusChecker("checker/units/test.csv")
-        checker_.IGNORE_ERRORS = True
-        checker_.YIELD_ERRORS = True
-        for i in checker_():
-            print(i)
-        print(2)
-        time.sleep(5)
+    print("start")
+    checker_ = SiteStatusChecker("checker/units/test.csv")
+    checker_.IGNORE_ERRORS = True
+    checker_.YIELD_ERRORS = True
+    for i in checker_():
+        print("output:", i)
+
+    print("stop")

@@ -1,5 +1,5 @@
 from checker.units.checker import Checker
-from checker.units.exceptions import SSCException, IgnoreInternetExceptions
+from checker.units.exceptions import IgnoreInternetExceptions, SSCException
 from checker.units.reader import CSVReader
 
 
@@ -12,26 +12,23 @@ class SiteStatusChecker(CSVReader):
 
     @staticmethod
     def error_checker(value):
-        if issubclass(type(value), SSCException):
+        if isinstance(value, SSCException):
             return True
         return False
 
     @IgnoreInternetExceptions()
     def __call__(self):
         for reader in super().__call__():
-            if self.error_checker(self.input_error_status):
-                if not self.IGNORE_ERRORS:
-                    yield str(self.input_error_status)
-                    return
-                if not self.YIELD_ERRORS:
-                    yield str(self.input_error_status)
+            if self.error_checker(self.input_error_status) and not self.IGNORE_ERRORS:
+                yield str(self.input_error_status)
+                return
             worker = Checker(reader)()
             if self.error_checker(worker):
+                if self.YIELD_ERRORS and self.IGNORE_ERRORS:
+                    yield worker
                 if not self.IGNORE_ERRORS:
-                    yield str(worker)
+                    yield worker
                     return
-                if not self.YIELD_ERRORS:
-                    yield str(worker)
                 continue
             if worker is not None:
                 yield worker
