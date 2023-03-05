@@ -25,9 +25,10 @@ class Checker(object):
     @IgnoreInternetExceptions()
     def check_port(host: str, port: int):
         socket_connection = socket.socket()
+        socket_connection.settimeout(10)
         try:
             socket_connection.connect((host, port))
-        except (socket.gaierror, ConnectionRefusedError, TimeoutError):
+        except (socket.gaierror, socket.timeout, ConnectionRefusedError, TimeoutError):
             return False
         return True
 
@@ -71,12 +72,12 @@ class Checker(object):
 
             if self.data.ports is None:
                 return [host_display_name, host_ip, self.data.ports], \
-                    "{0} | {1} | {2} | {3} | {4:.3} ms | -1 | ???".format(
+                    "{0}\t|\t{1}\t|\t{2}\t|\t{3}\t|\t{4:.3} ms\t|\t-1\t|\t???".format(
                         datetime.now(), host_display_name, host_ip, 0.0,
                         ping(host_ip, timeout=500, unit="ms")
                     )
             elif self.data.host in ["127.0.0.1", "localhost"] and self.data.ports == []:
-                return "{0} | {1} | {2} | 0.0 | {3:.3} ms | -1 | ???".format(
+                return "{0}\t|\t{1}\t|\t{2}\t|\t0.0\t|\t{3:.3} ms\t|\t-1\t|\t???".format(
                     datetime.now(), host_display_name, host_ip[0],
                     ping(host_ip[0], timeout=500, unit="ms")
                 )
@@ -84,7 +85,7 @@ class Checker(object):
                 result = ""
                 for ip in host_ip:
                     for port in self.data.ports:
-                        result += "{0} | {1} | {2} | 0.0 | {3:.3} ms | {4} | {5}\n".format(
+                        result += "{0}\t|\t{1}\t|\t{2}\t|\t0.0\t|\t{3:.3} ms\t|\t{4}\t|\t{5}\n".format(
                             datetime.now(), host_display_name, ip,
                             ping(ip, timeout=500, unit="ms"), port,
                             "Opened" if self.check_port(ip, port) else "Not opened"
@@ -95,4 +96,3 @@ class Checker(object):
 
     def __repr__(self):
         return "Checker({0})".format(repr(self.data))
-

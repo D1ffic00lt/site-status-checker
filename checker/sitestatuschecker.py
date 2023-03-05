@@ -1,7 +1,7 @@
 from typing import Union, List
 from checker.units.reader import CSVReader
 from checker.units.checker import Checker
-from checker.units.exceptions import SSCException, CheckerException
+from checker.units.exceptions import SSCException
 
 
 class SiteStatusChecker(object):
@@ -32,7 +32,7 @@ class SiteStatusChecker(object):
             for read_object in reader():
                 worker = Checker(read_object)()
                 if self.error_checker(worker):
-                    yield worker  # TODO
+                    yield worker
                     if not self.IGNORE_ERRORS:
                         return
                 if worker is not None:
@@ -44,9 +44,3 @@ class SiteStatusChecker(object):
     def __repr__(self):
         return "{0}()".format(self.__class__.__name__)
 
-
-if __name__ == "__main__":
-    checker_ = SiteStatusChecker(CSVReader("units/test.csv"))
-    checker_.IGNORE_ERRORS = True
-    for i in checker_():
-        print(i)
