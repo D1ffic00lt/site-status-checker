@@ -24,9 +24,13 @@ class Checker(object):
 
     @IgnoreInternetExceptions(check_ip=True)
     def get_ip_success(self, ip: str):
-        return requests.get(
-            self.get_correct_url(ip), timeout=10
-        )
+        try:
+            requests.get(
+                self.get_correct_url(ip), timeout=10
+            )
+        except requests.exceptions.Timeout:
+            return False
+        return True
 
     def get_status_code(self, url):
         try:
@@ -58,7 +62,6 @@ class Checker(object):
 
     def __call__(self):
         # FIXME
-        # TODO get cite name
         if self.data.host is not None:
             is_ip = re.findall(IP, self.data.host) != []
             if is_ip:
@@ -67,8 +70,7 @@ class Checker(object):
                     return CheckerException("ip is not success {0} {1}".format(ip, self.get_ip_success(ip)))
                 if not self.check_port(ip, 443) or not self.check_port(ip, 80):
                     return CheckerException("HTTPS or HTT ports closed ({0})".format(ip))
-                if self.get_status_code(ip) // 100 not in [1, 2, 3]:
-                    return CheckerException("bad request code ({0})".format(self.get_status_code(ip)))
+                status_code = self.get_status_code(ip)
             else:
                 if self.data.ports is not None and self.data.host != "localhost":
                     if not self.check_port(self.data.host, 443) or not self.check_port(self.data.host, 80):
@@ -76,15 +78,15 @@ class Checker(object):
                 if isinstance(self.get_ip_from_host(self.data.host), bool):
                     return CheckerException("can't get ip from the host ({0})".format(self.data.host))
                 if self.data.host not in ["127.0.0.1", "localhost"]:
-
                     if not self.get_ip_success(self.data.host):
                         return CheckerException("ip is not success ({0} {1})".format(
                             self.data.host, self.get_ip_success(self.data.host)
                         ))
-                if self.get_status_code(self.data.host) // 100 not in [1, 2, 3]:
-                    return CheckerException(
-                        "bad request code ({0})".format(self.get_status_code(self.data.host))
-                    )
+                status_code = self.get_status_code(self.data.host)
+            if status_code // 100 == 5:
+                return CheckerException("server error ({0})".format(status_code))
+            if status_code // 100 == 4:
+                return CheckerException("client error ({0})".format(status_code))
 
             host_display_name = "???" if is_ip else self.data.host
             host_ip = self.get_ip_from_host(self.data.host)

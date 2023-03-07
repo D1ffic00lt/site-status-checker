@@ -1,5 +1,3 @@
-import requests
-
 from checker.sitestatuschecker import SiteStatusChecker
 
 if __name__ == "__main__":
@@ -8,6 +6,6 @@ if __name__ == "__main__":
     checker_.IGNORE_ERRORS = True
     checker_.YIELD_ERRORS = True
     for i in checker_():
-        print("output:", i)
+        print(i)
 
     print("stop")

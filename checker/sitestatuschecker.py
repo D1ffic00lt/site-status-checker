@@ -1,4 +1,4 @@
-from checker.units.checker import Checker
+from checker.units.sitechecker import Checker
 from checker.units.exceptions import IgnoreInternetExceptions, SSCException
 from checker.units.reader import CSVReader
 
