@@ -1,4 +1,4 @@
-from checker.units.sitechecker import Checker
+from checker.units.controller import Controller
 from checker.units.exceptions import IgnoreInternetExceptions, SSCException
 from checker.units.reader import CSVReader
 
@@ -16,13 +16,12 @@ class SiteStatusChecker(CSVReader):
             return True
         return False
 
-    @IgnoreInternetExceptions()
     def __call__(self):
         for reader in super().__call__():
             if self.error_checker(self.input_error_status) and not self.IGNORE_ERRORS:
                 yield str(self.input_error_status)
                 return
-            worker = Checker(reader)()
+            worker = Controller(reader)()
             if self.error_checker(worker):
                 if self.YIELD_ERRORS and self.IGNORE_ERRORS:
                     yield worker
