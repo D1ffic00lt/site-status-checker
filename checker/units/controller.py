@@ -7,16 +7,17 @@ import urllib.request
 from ping3 import ping
 from datetime import datetime
 
-from checker.units.exceptions import IgnoreInternetExceptions, CheckerException
+from checker.units.exceptions import IgnoreInternetExceptions, CheckerException, InternetConnectionError
 from checker.units.reader import ReadObject
 from checker.units.config import IP
+from checker.units.config import headers
 
-
-class Checker(object):
+class Controller(object):
     def __init__(self, data: ReadObject):
         self.data: ReadObject = data
 
     @staticmethod
+    @IgnoreInternetExceptions()
     def get_correct_url(url: str):
         if "http://" in url or "https://" in url:
             return url
@@ -24,10 +25,16 @@ class Checker(object):
 
     @IgnoreInternetExceptions(check_ip=True)
     def get_ip_success(self, ip: str):
-        return requests.get(
-            self.get_correct_url(ip), timeout=10
-        )
+        try:
+            requests.get(
+                self.get_correct_url(ip), timeout=10,
+                headers=headers
+            )
+        except requests.exceptions.Timeout:
+            return False
+        return True
 
+    @IgnoreInternetExceptions()
     def get_status_code(self, url):
         try:
             conn = urllib.request.urlopen(
@@ -40,6 +47,7 @@ class Checker(object):
         return conn.getcode()
 
     @staticmethod
+    @IgnoreInternetExceptions()
     def check_port(host: str, port: int):
         socket_connection = socket.socket()
         socket_connection.settimeout(10)
@@ -50,45 +58,50 @@ class Checker(object):
         return True
 
     @staticmethod
+    @IgnoreInternetExceptions()
     def get_ip_from_host(host: str):
         try:
             return socket.gethostbyname(host)
         except socket.gaierror:
             return False
 
+    @IgnoreInternetExceptions()
     def __call__(self):
         # FIXME
-        # TODO get cite name
         if self.data.host is not None:
             is_ip = re.findall(IP, self.data.host) != []
             if is_ip:
                 ip = ".".join(re.findall(IP, self.data.host)[0])
-                if self.get_ip_success(ip):
+                ip_status = self.get_ip_success(ip)
+                if not isinstance(ip_status, InternetConnectionError) and not ip_status:
                     return CheckerException("ip is not success {0} {1}".format(ip, self.get_ip_success(ip)))
                 if not self.check_port(ip, 443) or not self.check_port(ip, 80):
                     return CheckerException("HTTPS or HTT ports closed ({0})".format(ip))
-                if self.get_status_code(ip) // 100 not in [1, 2, 3]:
-                    return CheckerException("bad request code ({0})".format(self.get_status_code(ip)))
+                status_code = self.get_status_code(ip)
             else:
-                if self.data.ports is not None and self.data.host != "localhost":
-                    if not self.check_port(self.data.host, 443) or not self.check_port(self.data.host, 80):
-                        return CheckerException("HTTPS or HTT ports closed {0}".format(self.data.host))
                 if isinstance(self.get_ip_from_host(self.data.host), bool):
                     return CheckerException("can't get ip from the host ({0})".format(self.data.host))
                 if self.data.host not in ["127.0.0.1", "localhost"]:
-
-                    if not self.get_ip_success(self.data.host):
+                    ip_status = self.get_ip_success(self.data.host)
+                    if not ip_status and not isinstance(ip_status, InternetConnectionError):
                         return CheckerException("ip is not success ({0} {1})".format(
                             self.data.host, self.get_ip_success(self.data.host)
                         ))
-                if self.get_status_code(self.data.host) // 100 not in [1, 2, 3]:
-                    return CheckerException(
-                        "bad request code ({0})".format(self.get_status_code(self.data.host))
-                    )
+                if self.data.ports is not None and self.data.host != "localhost":
+                    if not self.check_port(self.data.host, 443) or not self.check_port(self.data.host, 80):
+                        return CheckerException("HTTPS or HTT ports closed {0}".format(self.data.host))
+                status_code = self.get_status_code(self.data.host)
+            if status_code // 100 == 5:
+                return CheckerException("server error ({0})".format(status_code))
+            # if status_code // 100 == 4:
+            #     return CheckerException("client error ({0})".format(status_code))
 
             host_display_name = "???" if is_ip else self.data.host
             host_ip = self.get_ip_from_host(self.data.host)
             host_ip = [host_ip] if isinstance(host_ip, str) else host_ip
+
+            if isinstance(host_ip, InternetConnectionError):
+                return host_ip
 
             if self.data.ports is None:
                 return [host_display_name, host_ip, self.data.ports], \
@@ -115,4 +128,4 @@ class Checker(object):
                 return result
 
     def __repr__(self):
-        return "Checker({0})".format(repr(self.data))
+        return "Controller({0})".format(repr(self.data))
