@@ -86,8 +86,8 @@ class Checker(object):
                 status_code = self.get_status_code(self.data.host)
             if status_code // 100 == 5:
                 return CheckerException("server error ({0})".format(status_code))
-            if status_code // 100 == 4:
-                return CheckerException("client error ({0})".format(status_code))
+            # if status_code // 100 == 4:
+            #     return CheckerException("client error ({0})".format(status_code))
 
             host_display_name = "???" if is_ip else self.data.host
             host_ip = self.get_ip_from_host(self.data.host)
