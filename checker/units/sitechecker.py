@@ -10,7 +10,7 @@ from datetime import datetime
 from checker.units.exceptions import IgnoreInternetExceptions, CheckerException
 from checker.units.reader import ReadObject
 from checker.units.config import IP
-
+from checker.units.config import headers
 
 class Checker(object):
     def __init__(self, data: ReadObject):
@@ -26,7 +26,8 @@ class Checker(object):
     def get_ip_success(self, ip: str):
         try:
             requests.get(
-                self.get_correct_url(ip), timeout=10
+                self.get_correct_url(ip), timeout=10,
+                headers=headers
             )
         except requests.exceptions.Timeout:
             return False
