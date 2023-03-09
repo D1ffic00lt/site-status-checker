@@ -22,7 +22,7 @@ class ReadObject(object):
         return self._results
 
     def __repr__(self) -> str:
-        return "ReadObject({0}, {1})".format(self.host, self.ports)
+        return "{0}({1}, {2})".format(self.__class__.__name__, self.host, self.ports)
 
 
 class CSVReader(object):
@@ -56,7 +56,7 @@ class CSVReader(object):
         return []
 
     def __repr__(self) -> str:
-        return "CSVReader({0})".format(self.filename)
+        return "{0}({1})".format(self.__class__.__name__, self.filename)
 
     def __str__(self):
         return "[{0}]".format(", ".join([repr(obj) for obj in self.units]))
