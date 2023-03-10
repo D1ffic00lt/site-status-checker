@@ -41,7 +41,7 @@ class SSCException(Exception):
         super().__init__(message)
 
     def __str__(self):
-        return "{}: {}".format(self.__class__.__name__, self.message)
+        return "{}".format(self.message)
 
     def __repr__(self):
         return "{0}({1})".format(self.__class__.__name__, self.message)
@@ -51,6 +51,13 @@ class CSVReaderException(SSCException):
     def __init__(self, message: str):
         super().__init__(message)
 
+class DataInvalidFormat(CSVReaderException):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+class FileInvalidFormat(CSVReaderException):
+    def __init__(self, message: str):
+        super().__init__(message)
 
 class CheckerException(SSCException):
     def __init__(self, message: str):

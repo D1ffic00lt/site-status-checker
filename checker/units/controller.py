@@ -5,7 +5,6 @@ import urllib.error
 import urllib.request
 
 from ping3 import ping
-from datetime import datetime
 
 from checker.units.exceptions import (
     IgnoreInternetExceptions, CheckerException, InternetConnectionError
@@ -104,12 +103,12 @@ class Controller(object):
 
             if self.data.ports is None:
                 return dict(
-                        date=datetime.now(), host_name=host_display_name,
+                    host_name=host_display_name,
                     host_ip=host_ip, ping=ping(host_ip, timeout=500, unit="ms")
-                    )
+                )
             elif self.data.host in ["127.0.0.1", "localhost"] and self.data.ports == []:
                 return dict(
-                    date=datetime.now(), host_name=host_display_name,
+                    host_name=host_display_name,
                     host_ip=host_ip[0], ping=ping(host_ip[0], timeout=500, unit="ms")
                 )
             else:
@@ -118,7 +117,7 @@ class Controller(object):
                     for port in self.data.ports:
                         result.append(
                             dict(
-                                date=datetime.now(), host_name=host_display_name, host_ip=ip,
+                                host_name=host_display_name, host_ip=ip,
                                 ping=ping(ip, timeout=500, unit="ms"), port=port,
                                 port_status="Opened" if self.check_port(ip, port) else "Not opened"
                             )

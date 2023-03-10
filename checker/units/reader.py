@@ -3,7 +3,7 @@ import pandas as pd
 
 from typing import Union
 
-from checker.units.exceptions import CSVReaderException
+from checker.units.exceptions import DataInvalidFormat, FileInvalidFormat
 
 
 class ReadObject(object):
@@ -33,28 +33,34 @@ class CSVReader(object):
         self.units = self.read()
 
     def get_file_exists_status(self) -> bool:
-        return os.path.exists(self.filename)
+        return os.path.isfile(self.filename)
 
     def read(self):
-        if self.get_file_exists_status():
-            data = pd.read_csv(self.filename, sep=";")
-            data = data.astype(str)
-            values = []
-            for host, ports in data.values.tolist():
-                if ports in ["nan", "", [], None]:
-                    ports = None
-                if host in ["nan", "", [], None]:
-                    host = None
-                    self.input_error_status = CSVReaderException("host must not be None".format(ports))
-                if ports is not None:
-                    if not ports.isdigit() and ports != "nan":
-                        if not all([i.isdigit() for i in ports.split(",")]):
-                            self.input_error_status = CSVReaderException("all ports must be int ({0})".format(ports))
-                            continue
-                values.append(ReadObject(host, ports))
-            return values
-        self.input_error_status = CSVReaderException("file {0} not found".format(self.filename))
-        return []
+        if not self.get_file_exists_status():
+            self.input_error_status = FileInvalidFormat("file {0} not found".format(self.filename))
+            return []
+        if self.filename[-4:] != ".csv":
+            self.input_error_status = FileInvalidFormat("file {0} must be .csv".format(self.filename))
+            return []
+        data = pd.read_csv(self.filename, sep=";")
+        if list(map(str.lower, data.columns)) != ["host", "ports"]:
+            self.input_error_status = FileInvalidFormat("the table should have columns \"Host\" and \"Ports\"")
+            return []
+        data = data.astype(str)
+        values = []
+        for host, ports in data.values.tolist():
+            if ports in ["nan", "", [], None]:
+                ports = None
+            if host in ["nan", "", [], None]:
+                host = None
+                self.input_error_status = DataInvalidFormat("host must be not None".format(ports))
+            if ports is not None:
+                if not ports.isdigit() and ports != "nan":
+                    if not all([i.isdigit() for i in ports.split(",")]):
+                        self.input_error_status = DataInvalidFormat("all ports must be int ({0})".format(ports))
+                        continue
+            values.append(ReadObject(host, ports))
+        return values
 
     def __repr__(self) -> str:
         return "CSVReader({0})".format(self.filename)
