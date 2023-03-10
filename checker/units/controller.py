@@ -7,7 +7,9 @@ import urllib.request
 from ping3 import ping
 from datetime import datetime
 
-from checker.units.exceptions import IgnoreInternetExceptions, CheckerException, InternetConnectionError
+from checker.units.exceptions import (
+    IgnoreInternetExceptions, CheckerException, InternetConnectionError
+)
 from checker.units.reader import ReadObject
 from checker.units.config import IP
 from checker.units.config import headers
@@ -67,14 +69,13 @@ class Controller(object):
 
     @IgnoreInternetExceptions()
     def __call__(self):
-        # FIXME
         if self.data.host is not None:
             is_ip = re.findall(IP, self.data.host) != []
             if is_ip:
                 ip = ".".join(re.findall(IP, self.data.host)[0])
                 ip_status = self.get_ip_success(ip)
                 if not isinstance(ip_status, InternetConnectionError) and not ip_status:
-                    return CheckerException("ip is not success {0} {1}".format(ip, self.get_ip_success(ip)))
+                    return CheckerException("ip is not success ({0})".format(ip, self.get_ip_success(ip)))
                 if not self.check_port(ip, 443) or not self.check_port(ip, 80):
                     return CheckerException("HTTPS or HTT ports closed ({0})".format(ip))
                 status_code = self.get_status_code(ip)
@@ -84,9 +85,7 @@ class Controller(object):
                 if self.data.host not in ["127.0.0.1", "localhost"]:
                     ip_status = self.get_ip_success(self.data.host)
                     if not ip_status and not isinstance(ip_status, InternetConnectionError):
-                        return CheckerException("ip is not success ({0} {1})".format(
-                            self.data.host, self.get_ip_success(self.data.host)
-                        ))
+                        return CheckerException("ip is not success ({0})".format(self.data.host))
                 if self.data.ports is not None and self.data.host != "localhost":
                     if not self.check_port(self.data.host, 443) or not self.check_port(self.data.host, 80):
                         return CheckerException("HTTPS or HTT ports closed {0}".format(self.data.host))
@@ -104,27 +103,26 @@ class Controller(object):
                 return host_ip
 
             if self.data.ports is None:
-                return [host_display_name, host_ip, self.data.ports], \
-                    "{0}\t|\t{1}\t|\t{2}\t|\t{3}\t|\t{4:.3} ms\t|\t-1\t|\t???".format(
-                        datetime.now(), host_display_name, host_ip, 0.0,
-                        ping(host_ip, timeout=500, unit="ms")
+                return dict(
+                        date=datetime.now(), host_name=host_display_name,
+                    host_ip=host_ip, ping=ping(host_ip, timeout=500, unit="ms")
                     )
             elif self.data.host in ["127.0.0.1", "localhost"] and self.data.ports == []:
-                return "{0}\t|\t{1}\t|\t{2}\t|\t0.0\t|\t{3:.3} ms\t|\t-1\t|\t???".format(
-                    datetime.now(), host_display_name, host_ip[0],
-                    ping(host_ip[0], timeout=500, unit="ms")
+                return dict(
+                    date=datetime.now(), host_name=host_display_name,
+                    host_ip=host_ip[0], ping=ping(host_ip[0], timeout=500, unit="ms")
                 )
             else:
-                result = ""
+                result = []
                 for ip in host_ip:
                     for port in self.data.ports:
-                        result += "{0}\t|\t{1}\t|\t{2}\t|\t0.0\t|\t{3:.3} ms\t|\t{4}\t|\t{5}\n".format(
-                            datetime.now(), host_display_name, ip,
-                            ping(ip, timeout=500, unit="ms"), port,
-                            "Opened" if self.check_port(ip, port) else "Not opened"
+                        result.append(
+                            dict(
+                                date=datetime.now(), host_name=host_display_name, host_ip=ip,
+                                ping=ping(ip, timeout=500, unit="ms"), port=port,
+                                port_status="Opened" if self.check_port(ip, port) else "Not opened"
+                            )
                         )
-                if result[-1:] == "\n":
-                    return result[:-1]
                 return result
 
     def __repr__(self):
