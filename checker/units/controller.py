@@ -82,7 +82,7 @@ class Controller(object):
     def __call__(self) -> Union[InternetConnectionError, CheckerException, set, dict[str, Union[str, float]], list[dict], str]:
         if self.data.host is not None:
             is_ip = re.findall(IP, self.data.host) != []
-            if is_ip:
+            if is_ip and "127.0.0.1" not in self.data.host:
                 ip = ".".join(re.findall(IP, self.data.host)[0])
                 ip_status = self.get_ip_success(ip)
                 if not isinstance(ip_status, InternetConnectionError) and not ip_status:
@@ -99,7 +99,7 @@ class Controller(object):
                     ip_status = self.get_ip_success(self.data.host)
                     if not ip_status and not isinstance(ip_status, InternetConnectionError):
                         return CheckerException("ip is not success ({0})".format(self.data.host))
-                if self.data.ports is not None and self.data.host != "localhost":
+                if self.data.ports is not None and self.data.host not in ["localhost", "127.0.0.1"]:
                     if not self.check_port(self.data.host, 443) or not self.check_port(self.data.host, 80):
                         return CheckerException("HTTPS or HTT ports closed {0}".format(self.data.host))
                 status_code = self.get_status_code(self.data.host)
