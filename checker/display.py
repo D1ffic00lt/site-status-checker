@@ -70,6 +70,12 @@ class Display(object):
     def show(self):
         logging.info("Check starting...")
         for i in self.worker():
+            if isinstance(i, list):
+                for j in i:
+                    if j is not None:
+                        self.send(j)
+                continue
+
             if i is not None:
                 self.send(i)
         logging.info("Check completed!")

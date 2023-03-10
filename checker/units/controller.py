@@ -62,7 +62,10 @@ class Controller(object):
     @IgnoreInternetExceptions()
     def get_ip_from_host(host: str):
         try:
-            return socket.gethostbyname(host)
+            data = []
+            for i in socket.getaddrinfo(host, 80):
+                data.append(i[-1][0])
+            return set(data)
         except socket.gaierror:
             return False
 
@@ -106,10 +109,11 @@ class Controller(object):
 
             host_display_name = "???" if is_ip else self.data.host
             host_ip = self.get_ip_from_host(self.data.host)
-            host_ip = [host_ip] if isinstance(host_ip, str) else host_ip
 
             if isinstance(host_ip, InternetConnectionError):
                 return host_ip
+
+            host_ip = list(host_ip)
 
             if self.data.ports is None:
                 return dict(
@@ -118,20 +122,21 @@ class Controller(object):
                 )
             elif self.data.host in ["127.0.0.1", "localhost"] and self.data.ports == []:
                 return dict(
-                    host_name=host_display_name,
-                    host_ip=host_ip[0], ping=ping(host_ip[0], timeout=500, unit="ms")
+                    host_name="localhost",
+                    host_ip="127.0.0.1", ping=ping(host_ip[0], timeout=500, unit="ms")
                 )
             else:
                 result = []
                 for ip in host_ip:
                     for port in self.data.ports:
-                        result.append(
-                            dict(
-                                host_name=host_display_name, host_ip=ip,
-                                ping=ping(ip, timeout=500, unit="ms"), port=port,
-                                port_status="Opened" if self.check_port(ip, port) else "Not opened"
+                        if len(re.findall(IP, ip)) != 0:
+                            result.append(
+                                dict(
+                                    host_name=host_display_name, host_ip=ip,
+                                    ping=ping(ip, timeout=500, unit="ms"), port=port,
+                                    port_status="Opened" if self.check_port(ip, port) else "Not opened"
+                                )
                             )
-                        )
                 return result
 
     def __repr__(self):

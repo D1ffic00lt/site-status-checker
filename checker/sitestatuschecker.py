@@ -23,13 +23,13 @@ class SiteStatusChecker(CSVReader):
                 *outputs.values()
             )
         elif isinstance(outputs, list):
-            result = ""
+            result = []
             for output in outputs:
-                result += "\t|\t{0}\t|\t{1}\t|\t{2:.3f} ms\t|\t{3}\t|\t{4}\n".format(
-                    *output.values()
+                result.append(
+                    "\t|\t{0}\t|\t{1}\t|\t{2:.3f} ms\t|\t{3}\t|\t{4}".format(
+                        *output.values()
+                    )
                 )
-            if result[-1:] == "\n":
-                return result[:-1]
             return result
 
     def __call__(self):
