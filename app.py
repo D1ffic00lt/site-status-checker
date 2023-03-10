@@ -7,4 +7,4 @@ if __name__ == "__main__":
         app = Display()
         app.create_schedule()
     except Exception as e:
-        logging.critical(f"{e.__class__.__name__}: {e.args[0]}")
+        logging.critical(f"{e.__class__.__name__}({e.args[0]})")

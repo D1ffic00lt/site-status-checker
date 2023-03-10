@@ -10,14 +10,14 @@ from checker.units.exceptions import SSCException, FileInvalidFormat, DataInvali
 
 
 class Display(object):
-    def __init__(self):
+    def __init__(self) -> None:
         self.worker = None
         self.ignore_errors = False
         self.setup_logging()
         self.get_file_name()
 
     @staticmethod
-    def setup_logging():
+    def setup_logging() -> None:
         logging.basicConfig(format=FORMAT, datefmt=DATE_FORMAT, level=logging.INFO)
         handler = logging.FileHandler(LOG_PATH, mode='+a')
         handler.setFormatter(logging.Formatter(FORMAT))
@@ -26,7 +26,7 @@ class Display(object):
         warnings.filterwarnings("ignore")
         logging.info("Set filterwarnings ignore")
 
-    def send(self, value):
+    def send(self, value) -> None:
         if isinstance(value, DataInvalidFormat):
             logging.error(value)
             if not self.ignore_errors:
@@ -40,7 +40,7 @@ class Display(object):
         else:
             logging.info(value)
 
-    def get_file_name(self):
+    def get_file_name(self) -> None:
         logging.info("Enter filename (csv): ")
         filename = input()
         if not os.path.exists(filename):
@@ -61,13 +61,13 @@ class Display(object):
         self.worker = worker
         logging.info("Worker created")
 
-    def create_schedule(self):
+    def create_schedule(self) -> None:
         self.show()
         schedule.every().hour.do(self.show)
         while True:
             schedule.run_pending()
 
-    def show(self):
+    def show(self) -> None:
         logging.info("Check starting...")
         for i in self.worker():
             if isinstance(i, list):

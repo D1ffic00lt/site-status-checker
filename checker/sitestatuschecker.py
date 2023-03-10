@@ -1,3 +1,5 @@
+from typing import Union, Any
+
 from checker.units.controller import Controller
 from checker.units.exceptions import SSCException, FileInvalidFormat
 from checker.units.reader import CSVReader
@@ -11,28 +13,35 @@ class SiteStatusChecker(CSVReader):
 
 
     @staticmethod
-    def error_checker(value):
+    def error_checker(value: Any) -> bool:
         if isinstance(value, SSCException):
             return True
         return False
 
     @staticmethod
-    def get_text_description(outputs):
+    def get_text_description(outputs: Union[dict, list]) -> str:
         if isinstance(outputs, dict):
-            return "\t|\t{0}\t|\t{1}\t|\t{2:.3f} ms\t|\t???\t".format(
+            return "host: {0}\t|\tip: {1}\t|\tRTT: {2:.3f} ms\t|\tport: ???\t|\tmulty ip: {3}".format(
                 *outputs.values()
             )
-        elif isinstance(outputs, list):
+        else:
             result = []
             for output in outputs:
-                result.append(
-                    "\t|\t{0}\t|\t{1}\t|\t{2:.3f} ms\t|\t{3}\t|\t{4}".format(
-                        *output.values()
+                if len(output.values()) == 6:
+                    result.append(
+                        "host: {0}\t|\tip: {1}\t|\tRTT: {2:.3f} ms\t|\tport: {3}\t|\tstatus: {4}\t|\tmulty ip: {5}".format(
+                            *output.values()
+                        )
                     )
-                )
+                else:
+                    result.append(
+                        "host: {0}\t|\tip: {1}\t|\tRTT: {2:.3f} ms\t|\tport: ???\t|\tmulty ip: {3}".format(
+                            *output.values()
+                        )
+                    )
             return result
 
-    def __call__(self):
+    def __call__(self) -> Any:
         if isinstance(self.input_error_status, SSCException):
             if isinstance(self.input_error_status, FileInvalidFormat) or not self.IGNORE_ERRORS:
                 yield self.input_error_status
@@ -48,8 +57,8 @@ class SiteStatusChecker(CSVReader):
             if worker is not None:
                 yield self.get_text_description(worker)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "[{0}]".format(", ".join([str(obj) for obj in self.units]))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{0}()".format(self.__class__.__name__)
