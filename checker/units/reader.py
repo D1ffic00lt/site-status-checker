@@ -45,6 +45,7 @@ class CSVReader(object):
                     ports = None
                 if host in ["nan", "", [], None]:
                     host = None
+                    self.input_error_status = CSVReaderException("host must not be None".format(ports))
                 if ports is not None:
                     if not ports.isdigit() and ports != "nan":
                         if not all([i.isdigit() for i in ports.split(",")]):

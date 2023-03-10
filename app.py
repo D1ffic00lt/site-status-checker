@@ -1,11 +1,5 @@
-from checker.units.sitestatuschecker import SiteStatusChecker
+from checker.display import Display
 
 if __name__ == "__main__":
-    print("start")
-    checker_ = SiteStatusChecker("checker/units/test.csv")
-    checker_.IGNORE_ERRORS = False
-    checker_.YIELD_ERRORS = False
-    for i in checker_():
-        print(i)
-
-    print("stop")
+    app = Display()
+    app.create_schedule()

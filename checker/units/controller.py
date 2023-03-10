@@ -69,7 +69,6 @@ class Controller(object):
 
     @IgnoreInternetExceptions()
     def __call__(self):
-        # FIXME
         if self.data.host is not None:
             is_ip = re.findall(IP, self.data.host) != []
             if is_ip:
@@ -86,9 +85,7 @@ class Controller(object):
                 if self.data.host not in ["127.0.0.1", "localhost"]:
                     ip_status = self.get_ip_success(self.data.host)
                     if not ip_status and not isinstance(ip_status, InternetConnectionError):
-                        return CheckerException("ip is not success ({0} {1})".format(
-                            self.data.host, self.get_ip_success(self.data.host)
-                        ))
+                        return CheckerException("ip is not success ({0})".format(self.data.host))
                 if self.data.ports is not None and self.data.host != "localhost":
                     if not self.check_port(self.data.host, 443) or not self.check_port(self.data.host, 80):
                         return CheckerException("HTTPS or HTT ports closed {0}".format(self.data.host))

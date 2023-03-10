@@ -59,6 +59,3 @@ class CheckerException(SSCException):
 class InternetConnectionError(CheckerException):
     def __init__(self, message: str = ""):
         super().__init__(message)
-
-    def __str__(self):
-        return "{}()".format(self.__class__.__name__)
