@@ -1,5 +1,7 @@
+from typing import Union, Any
+
 from checker.units.controller import Controller
-from checker.units.exceptions import SSCException
+from checker.units.exceptions import SSCException, FileInvalidFormat
 from checker.units.reader import CSVReader
 
 class SiteStatusChecker(CSVReader):
@@ -11,42 +13,52 @@ class SiteStatusChecker(CSVReader):
 
 
     @staticmethod
-    def error_checker(value):
+    def error_checker(value: Any) -> bool:
         if isinstance(value, SSCException):
             return True
         return False
 
     @staticmethod
-    def get_text_description(outputs):
+    def get_text_description(outputs: Union[dict, list]) -> str:
         if isinstance(outputs, dict):
-            return "{0}\t|\t{1}\t|\t{2}\t|\t{3:.3f} ms\t|\t???\t".format(
+            return "host: {0}\t|\tip: {1}\t|\tRTT: {2:.3f} ms\t|\tport: ???\t|\tmulty ip: {3}".format(
                 *outputs.values()
             )
-        elif isinstance(outputs, list):
-            result = ""
+        else:
+            result = []
             for output in outputs:
-                result += "{0}\t|\t{1}\t|\t{2}\t|\t{3:.3f} ms\t|\t{4}\t|\t{5}\n".format(
-                    *output.values()
-                )
-            if result[-1:] == "\n":
-                return result[:-1]
+                if len(output.values()) == 6:
+                    result.append(
+                        "host: {0}\t|\tip: {1}\t|\tRTT: {2:.3f} ms\t|\tport: {3}\t|\tstatus: {4}\t|\tmulty ip: {5}".format(
+                            *output.values()
+                        )
+                    )
+                else:
+                    result.append(
+                        "host: {0}\t|\tip: {1}\t|\tRTT: {2:.3f} ms\t|\tport: ???\t|\tmulty ip: {3}".format(
+                            *output.values()
+                        )
+                    )
             return result
 
-    def __call__(self):
-        for reader in super().__call__():
-            if self.error_checker(self.input_error_status) and not self.IGNORE_ERRORS:
-                yield str(self.input_error_status)
+    def __call__(self) -> Any:
+        if isinstance(self.input_error_status, SSCException):
+            if isinstance(self.input_error_status, FileInvalidFormat) or not self.IGNORE_ERRORS:
+                yield self.input_error_status
                 return
-            else:
-                worker = Controller(reader)()
-                if self.error_checker(worker):
-                    if self.YIELD_ERRORS:
-                        yield str(worker)
-                if worker is not None:
-                    yield self.get_text_description(worker)
+            if self.YIELD_ERRORS:
+                yield self.input_error_status
 
-    def __str__(self):
+        for reader in super().__call__():
+            worker = Controller(reader)()
+            if self.error_checker(worker):
+                yield worker
+                continue
+            if worker is not None:
+                yield self.get_text_description(worker)
+
+    def __str__(self) -> str:
         return "[{0}]".format(", ".join([str(obj) for obj in self.units]))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{0}()".format(self.__class__.__name__)
