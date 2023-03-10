@@ -66,6 +66,14 @@ class Controller(object):
         except socket.gaierror:
             return False
 
+    @staticmethod
+    @IgnoreInternetExceptions()
+    def get_host_from_ip(host: str):
+        try:
+            return socket.gethostbyaddr(host)
+        except socket.gaierror:
+            return False
+
     @IgnoreInternetExceptions()
     def __call__(self):
         if self.data.host is not None:
@@ -75,6 +83,8 @@ class Controller(object):
                 ip_status = self.get_ip_success(ip)
                 if not isinstance(ip_status, InternetConnectionError) and not ip_status:
                     return CheckerException("ip is not success ({0})".format(ip, self.get_ip_success(ip)))
+                if not self.get_host_from_ip(ip):
+                    return CheckerException("cant get host name by address")
                 if not self.check_port(ip, 443) or not self.check_port(ip, 80):
                     return CheckerException("HTTPS or HTT ports closed ({0})".format(ip))
                 status_code = self.get_status_code(ip)
