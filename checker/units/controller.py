@@ -15,6 +15,9 @@ from checker.units.config import IP
 from checker.units.config import headers
 
 class Controller(object):
+    __slots__ = (
+        "data",
+    )
     def __init__(self, data: ReadObject) -> None:
         self.data: ReadObject = data
 
@@ -149,4 +152,4 @@ class Controller(object):
                 return result
 
     def __repr__(self) -> str:
-        return "Controller({0})".format(repr(self.data))
+        return "{0}({1})".format(self.__class__.__name__, repr(self.data))

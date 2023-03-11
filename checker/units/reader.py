@@ -7,6 +7,9 @@ from checker.units.exceptions import DataInvalidFormat, FileInvalidFormat
 
 
 class ReadObject(object):
+    __slots__ = (
+        "host", "_ports", "_results"
+    )
     def __init__(self, host: str, ports: Union[str, None]) -> None:
         self.host = host
         self._ports = ports

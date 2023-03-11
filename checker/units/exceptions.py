@@ -5,6 +5,9 @@ from functools import wraps
 from typing import Union
 
 class IgnoreInternetExceptions(object):
+    __slots__ = (
+        "check_ip",
+    )
     def __init__(self, check_ip: bool = False) -> None:
         self.check_ip = check_ip
 
