@@ -31,8 +31,8 @@ from checker.units.exceptions import (
     IgnoreInternetExceptions, CheckerException, InternetConnectionError, SSCException
 )
 from checker.units.reader import ReadObject
-from checker.units.config import IP
-from checker.units.config import headers
+from checker.config import IP
+from checker.config import headers
 
 __all__ = ("Controller", )
 

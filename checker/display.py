@@ -24,7 +24,7 @@ import warnings
 import schedule
 import logging
 
-from checker.units.config import *
+from checker.config import *
 from checker.sitestatuschecker import SiteStatusChecker
 from checker.units.exceptions import SSCException, FileInvalidFormat, DataInvalidFormat
 
