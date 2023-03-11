@@ -8,36 +8,24 @@
 > 123
 
 ## Structure
-> checker
-> > units
-> > > &#95;&#95;init&#95;&#95;.py
-> > >
-> > > config.py
-> > >
-> > > controller.py
-> > > 
-> > > exceptions.py
-> > > 
-> > > reader.py
-> > > 
-> > > 
-> > &#95;&#95;init&#95;&#95;.py
-> >
-> > display.py
-> >
-> > sitestatuschecker.py
-> 
-> app.py
-> 
-> Dockerfile
-> 
-> run.sh
-> 
-> requirements.txt
-> 
-> .dockerignore & .gitignore
-> 
-> README.md & LICENCE.md
+- checker
+- - units 
+- - - &#95;&#95;init&#95;&#95;.py
+- - - controller.py
+- - - exceptions.py
+- - - reader.py
+- - &#95;&#95;init&#95;&#95;.py
+- - config.py
+- - display.py
+- - sitestatuschecker.py 
+- app.py
+- Dockerfile
+- run.sh
+- requirements.txt
+- .dockerignore 
+- .gitignore
+- README.md 
+- LICENCE.md
 
 ## Files and directories
 
