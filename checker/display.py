@@ -33,6 +33,20 @@ __all__ = (
 )
 
 class Display(object):
+    r"""
+    Class for passing data to the console and for periodically starting workers
+
+    setup_logging() -> None
+        The function is called when the class is initialized,
+        it is intended for setting up the logging module and ignoring warnings
+    get_file_name() -> None
+        A function to get the file name and to initialize the worker
+    create_schedule() -> None
+        A function to create a schedule for checking sites
+        (the function creates a schedule that runs the show function every hour)
+    show() -> None
+        Calls one iteration of the worker
+    """
     __slots__ = (
         "worker", "ignore_errors"
     )
@@ -44,6 +58,12 @@ class Display(object):
 
     @staticmethod
     def setup_logging() -> None:
+        r"""
+        The function is called when the class is initialized,
+        it is intended for setting up the logging module and ignoring warnings
+
+        :return: None
+        """
         logging.basicConfig(format=FORMAT, datefmt=DATE_FORMAT, level=logging.INFO)
         handler = logging.FileHandler(LOG_PATH, mode='+a')
         handler.setFormatter(logging.Formatter(FORMAT))
@@ -52,21 +72,12 @@ class Display(object):
         warnings.filterwarnings("ignore")
         logging.info("Set filterwarnings ignore")
 
-    def send(self, value) -> None:
-        if isinstance(value, DataInvalidFormat):
-            logging.error(value)
-            if not self.ignore_errors:
-                sys.exit(1)
-            logging.info("continue...")
-        elif isinstance(value, FileInvalidFormat):
-            logging.critical(value)
-            sys.exit(1)
-        elif isinstance(value, SSCException):
-            logging.warning(value)
-        else:
-            logging.info(value)
-
     def get_file_name(self) -> None:
+        r"""
+        A function to get the file name and to initialize the worker
+
+        :return: None
+        """
         logging.info("Enter filename (csv): ")
         filename = input()
         if not os.path.exists(filename):
@@ -88,20 +99,45 @@ class Display(object):
         logging.info("Worker created")
 
     def create_schedule(self) -> None:
+        r"""
+        A function to create a schedule for checking sites
+        (the function creates a schedule that runs the show function every hour)
+
+        :return: None
+        """
         self.show()
         schedule.every().hour.do(self.show)
         while True:
             schedule.run_pending()
 
     def show(self) -> None:
+        r"""
+        Calls one iteration of the worker
+
+        :return: None
+        """
         logging.info("Check starting...")
         for i in self.worker():
             if isinstance(i, list):
                 for j in i:
                     if j is not None:
-                        self.send(j)
+                        self.__send(j)
                 continue
 
             if i is not None:
-                self.send(i)
+                self.__send(i)
         logging.info("Check completed!")
+
+    def __send(self, value) -> None:
+        if isinstance(value, DataInvalidFormat):
+            logging.error(value)
+            if not self.ignore_errors:
+                sys.exit(1)
+            logging.info("continue...")
+        elif isinstance(value, FileInvalidFormat):
+            logging.critical(value)
+            sys.exit(1)
+        elif isinstance(value, SSCException):
+            logging.warning(value)
+        else:
+            logging.info(value)
