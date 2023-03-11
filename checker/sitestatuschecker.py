@@ -8,7 +8,7 @@ class SiteStatusChecker(CSVReader):
     IGNORE_ERRORS: bool = False
     YIELD_ERRORS: bool = False
 
-    def __init__(self, filename: str):
+    def __init__(self, filename: str) -> None:
         super().__init__(filename)
 
 
@@ -26,6 +26,7 @@ class SiteStatusChecker(CSVReader):
             )
         else:
             result = []
+
             for output in outputs:
                 if len(output.values()) == 6:
                     result.append(
@@ -39,6 +40,7 @@ class SiteStatusChecker(CSVReader):
                             *output.values()
                         )
                     )
+
             return result
 
     def __call__(self) -> Any:

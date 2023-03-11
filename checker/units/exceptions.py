@@ -2,7 +2,6 @@ import requests
 
 from time import sleep
 from functools import wraps
-from typing import Union
 
 class IgnoreInternetExceptions(object):
     __slots__ = (
@@ -15,7 +14,7 @@ class IgnoreInternetExceptions(object):
         return "{}()".format(self.__class__.__name__)
 
     @staticmethod
-    def check_internet_connection() -> Union[bool, requests.Response]:
+    def __check_internet_connection() -> bool:
         try:
             requests.head("http://www.google.com/", timeout=3)
         except requests.ConnectionError:
@@ -25,7 +24,7 @@ class IgnoreInternetExceptions(object):
     def __call__(self, func):
         @wraps(func)
         def decorator(*args, **kwargs):
-            if not self.check_internet_connection():
+            if not self.__check_internet_connection():
                 sleep(3)
                 return InternetConnectionError()
 
@@ -40,12 +39,15 @@ class IgnoreInternetExceptions(object):
 
 
 class SSCException(Exception):
+    __slots__ = (
+        "message",
+    )
     def __init__(self, message: str = ""):
         self.message = message
         super().__init__(message)
 
     def __str__(self) -> str:
-        return "{}".format(self.message)
+        return "{0}".format(self.message)
 
     def __repr__(self) -> str:
         return "{0}({1})".format(self.__class__.__name__, self.message)

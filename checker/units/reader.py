@@ -13,14 +13,17 @@ class ReadObject(object):
     def __init__(self, host: str, ports: Union[str, None]) -> None:
         self.host = host
         self._ports = ports
+
         if ports == "" or ports is None:
             self._ports = ""
+
         self._results = []
 
     @property
     def ports(self) -> list[int]:
         if self._results or self._ports == "":
             return self._results
+
         self._results = [int(port) for port in self._ports.split(",")]
         return self._results
 
@@ -42,15 +45,20 @@ class CSVReader(object):
         if not self.get_file_exists_status():
             self.input_error_status = FileInvalidFormat("file {0} not found".format(self.filename))
             return []
+
         if self.filename[-4:] != ".csv":
             self.input_error_status = FileInvalidFormat("file {0} must be .csv".format(self.filename))
             return []
+
         data = pd.read_csv(self.filename, sep=";")
+
         if list(map(str.lower, data.columns)) != ["host", "ports"]:
             self.input_error_status = FileInvalidFormat("the table should have columns \"Host\" and \"Ports\"")
             return []
+
         data = data.astype(str)
         values = []
+
         for host, ports in data.values.tolist():
             if ports in ["nan", "", [], None]:
                 ports = None
@@ -59,14 +67,16 @@ class CSVReader(object):
                     if not all([i.isdigit() for i in ports.split(",")]):
                         self.input_error_status = DataInvalidFormat("all ports must be int ({0})".format(ports))
                         continue
+
             if host in ["nan", "", [], None]:
                 host = None
                 self.input_error_status = DataInvalidFormat("host must be not None")
+
             values.append(ReadObject(host, ports))
         return values
 
     def __repr__(self) -> str:
-        return "CSVReader({0})".format(self.filename)
+        return "{0}({1})".format(self.__class__.__name__, self.filename)
 
     def __str__(self) -> str:
         return "[{0}]".format(", ".join([repr(obj) for obj in self.units]))
