@@ -48,7 +48,27 @@ docker build --no-cache -t sitestatuschecker . && run -it sitestatuschecker
 ```
 
 ### Python (+3.10)
+```
+pip3 install -r requirements.txt
+python3 app.py
+```
+
+### Bash script
+
+```
+bash run.sh
+```
+
 ```bash
+#!/bin/sh
+
+if ! command -v docker
+then
+  docker build --no-cache -t sitestatuschecker . && run -it sitestatuschecker
+  pause
+  exit
+fi
+
 pip3 install -r requirements.txt
 python3 app.py
 ```
