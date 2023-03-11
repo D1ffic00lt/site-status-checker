@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 import re
 import socket
 import requests
@@ -13,6 +14,8 @@ from checker.units.exceptions import (
 from checker.units.reader import ReadObject
 from checker.units.config import IP
 from checker.units.config import headers
+
+__all__ = ("Controller", )
 
 class Controller(object):
     __slots__ = (

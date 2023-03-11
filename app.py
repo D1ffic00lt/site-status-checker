@@ -1,6 +1,7 @@
+# -*- coding:utf-8 -*-
 import logging
 
-from checker.display import Display
+from checker import Display
 
 if __name__ == "__main__":
     try:

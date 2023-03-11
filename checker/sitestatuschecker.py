@@ -1,8 +1,13 @@
+# -*- coding:utf-8 -*-
 from typing import Union, Any
 
 from checker.units.controller import Controller
 from checker.units.exceptions import SSCException, FileInvalidFormat
 from checker.units.reader import CSVReader
+
+__all__ = (
+    "SiteStatusChecker",
+)
 
 class SiteStatusChecker(CSVReader):
     IGNORE_ERRORS: bool = False
