@@ -10,6 +10,9 @@ from checker.units.exceptions import SSCException, FileInvalidFormat, DataInvali
 
 
 class Display(object):
+    __slots__ = (
+        "worker", "ignore_errors"
+    )
     def __init__(self) -> None:
         self.worker = None
         self.ignore_errors = False

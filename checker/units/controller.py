@@ -15,8 +15,11 @@ from checker.units.config import IP
 from checker.units.config import headers
 
 class Controller(object):
-    def __init__(self, data: ReadObject) -> None:
-        self.data: ReadObject = data
+    __slots__ = (
+        "target",
+    )
+    def __init__(self, target: ReadObject) -> None:
+        self.target: ReadObject = target
 
     @staticmethod
     @IgnoreInternetExceptions()
@@ -80,67 +83,81 @@ class Controller(object):
 
     @IgnoreInternetExceptions()
     def __call__(self) -> Union[InternetConnectionError, CheckerException, set, dict[str, Union[str, float]], list[dict], str]:
-        if self.data.host is not None:
-            is_ip = re.findall(IP, self.data.host) != []
-            if is_ip and "127.0.0.1" not in self.data.host:
-                ip = ".".join(re.findall(IP, self.data.host)[0])
+        if self.target.host is not None:
+            is_ip = re.findall(IP, self.target.host) != []
+
+            if is_ip and "127.0.0.1" not in self.target.host:
+                ip = ".".join(re.findall(IP, self.target.host)[0])
                 ip_status = self.get_ip_success(ip)
+
                 if not isinstance(ip_status, InternetConnectionError) and not ip_status:
                     return CheckerException("ip is not success ({0})".format(ip, self.get_ip_success(ip)))
+
                 if not self.get_host_from_ip(ip):
                     return CheckerException("cant get host name by address")
+
                 if not self.check_port(ip, 443) or not self.check_port(ip, 80):
                     return CheckerException("HTTPS or HTT ports closed ({0})".format(ip))
+
                 status_code = self.get_status_code(ip)
             else:
-                if isinstance(self.get_ip_from_host(self.data.host), bool):
-                    return CheckerException("can't get ip from the host ({0})".format(self.data.host))
-                if self.data.host not in ["127.0.0.1", "localhost"]:
-                    ip_status = self.get_ip_success(self.data.host)
+                if isinstance(self.get_ip_from_host(self.target.host), bool):
+                    return CheckerException("can't get ip from the host ({0})".format(self.target.host))
+
+                if self.target.host not in ["127.0.0.1", "localhost"]:
+                    ip_status = self.get_ip_success(self.target.host)
+
                     if not ip_status and not isinstance(ip_status, InternetConnectionError):
-                        return CheckerException("ip is not success ({0})".format(self.data.host))
-                if self.data.ports is not None and self.data.host not in ["localhost", "127.0.0.1"]:
-                    if not self.check_port(self.data.host, 443) or not self.check_port(self.data.host, 80):
-                        return CheckerException("HTTPS or HTT ports closed {0}".format(self.data.host))
-                status_code = self.get_status_code(self.data.host)
+                        return CheckerException("ip is not success ({0})".format(self.target.host))
+
+                if self.target.ports is not None and self.target.host not in ["localhost", "127.0.0.1"]:
+                    if not self.check_port(self.target.host, 443) or not self.check_port(self.target.host, 80):
+                        return CheckerException("HTTPS or HTT ports closed {0}".format(self.target.host))
+
+                status_code = self.get_status_code(self.target.host)
             if status_code // 100 == 5:
                 return CheckerException("server error ({0})".format(status_code))
             # if status_code // 100 == 4:
             #     return CheckerException("client error ({0})".format(status_code))
 
-            host_display_name = "???" if is_ip else self.data.host
-            host_ip = self.get_ip_from_host(self.data.host) if not is_ip else [self.data.host]
+            host_display_name = "???" if is_ip else self.target.host
+            host_ip = self.get_ip_from_host(self.target.host) if not is_ip else [self.target.host]
 
             if isinstance(host_ip, InternetConnectionError):
                 return host_ip
 
             host_ip = list(filter(lambda x: len(re.findall(IP, x)) == 1, host_ip))
 
-            if self.data.host in ["127.0.0.1", "localhost"]:
+            if self.target.host in ["127.0.0.1", "localhost"]:
                 return dict(
                     host_name="localhost",
                     host_ip="127.0.0.1",
                     ping=ping(host_ip[0], timeout=500, unit="ms"),
                     status=len(host_ip) > 1
                 )
-            if not self.data.ports:
+
+            if not self.target.ports:
                 result = []
+
                 for ip in host_ip:
                     result.append(
                         dict(
                             host_name=host_display_name,
-                            host_ip=ip, ping=ping(ip, timeout=500, unit="ms"),
+                            host_ip=ip,
+                            ping=ping(ip, timeout=500, unit="ms"),
                             status=len(host_ip) > 1
                         )
                     )
                 return result
             else:
                 result = []
+
                 for ip in host_ip:
-                    for port in self.data.ports:
+                    for port in self.target.ports:
                         result.append(
                             dict(
-                                host_name=host_display_name, host_ip=ip,
+                                host_name=host_display_name,
+                                host_ip=ip,
                                 ping=ping(ip, timeout=500, unit="ms"), port=port,
                                 port_status="Opened" if self.check_port(ip, port) else "Not opened",
                                 status=len(host_ip) > 1
@@ -149,4 +166,4 @@ class Controller(object):
                 return result
 
     def __repr__(self) -> str:
-        return "Controller({0})".format(repr(self.data))
+        return "{0}({1})".format(self.__class__.__name__, repr(self.target))
