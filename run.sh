@@ -4,8 +4,7 @@
 
 if ! command -v docker
 then
-  docker build --no-cache -t sitestatuschecker .
-  docker run -it sitestatuschecker
+  docker build --no-cache -t sitestatuschecker . && run -it sitestatuschecker
   pause
   exit
 fi
