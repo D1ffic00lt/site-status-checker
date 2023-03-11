@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from typing import Union, Any
 
 from checker.units.controller import Controller
