@@ -51,8 +51,15 @@ class CSVReader(object):
             self.input_error_status = FileInvalidFormat("file {0} not found".format(self.filename))
             return []
 
-        if self.filename[-4:] != ".csv":
-            self.input_error_status = FileInvalidFormat("file {0} must be .csv".format(self.filename))
+        try:
+            if self.filename[-4:] != ".csv":
+                self.input_error_status = FileInvalidFormat("file {0} must be .csv".format(self.filename))
+                return []
+        except IndexError:
+            self.input_error_status = FileInvalidFormat("the total filename length must be >= 4 characters")
+            return []
+        except Exception as e:
+            self.input_error_status = FileInvalidFormat(e.args[0] + f"{e.__class__.__name__}")
             return []
 
         data = pd.read_csv(self.filename, sep=";")

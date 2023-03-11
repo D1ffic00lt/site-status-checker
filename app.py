@@ -9,4 +9,4 @@ if __name__ == "__main__":
         app.create_schedule()
     except Exception as e:
         logging.critical(f"{e.__class__.__name__}({e.args[0]})")
-        raise e
+        # raise e
