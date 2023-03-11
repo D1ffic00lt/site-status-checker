@@ -9,6 +9,9 @@ from checker.sitestatuschecker import SiteStatusChecker
 from checker.units.config import *
 from checker.units.exceptions import SSCException, FileInvalidFormat, DataInvalidFormat
 
+__all__ = (
+    "Display",
+)
 
 class Display(object):
     __slots__ = (
