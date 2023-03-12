@@ -4,31 +4,34 @@
 ## Task
 > Deployment of a small Python application so that it can be reserved for you in </br> case any of the sites is unavailable due to some random situation.
 
-## Project structure 
+## Project structure, files and directories
+
+### Structure
+
 ```
 .
 ├── checker
 │   ├── units             
 │   │   ├── __init__.py        
-│   │   ├── config.py         
 │   │   ├── controller.py
 │   │   ├── exceptions.py
 │   │   ├── exceptions.py
 │   │   └── reader.py
 │   ├── __init__.py
+│   ├── config.py
 │   ├── display.py
 │   └── sitestatuschecker.py 
 ├── app.py
-├── Dockerfile
 ├── run.sh
-├── requirements.txt
 ├── README.md
+├── .gitignore
+├── Dockerfile
 ├── LICENCE.md
 ├── .dockerignore
-└── .gitignore
+└── requirements.txt
 ```
 
-## Files and directories
+### Files and directories
 
 | Name                                                       | Description                                                                                                                                           |
 |------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -97,10 +100,10 @@ python3 app.py
 ## Exceptions
 
 ```
-SSCException
-├── CSVReaderException             
-│   ├── DataInvalidFormat     
-│   └── FileInvalidFormat
-├── CheckerException
-└── InternetConnectionError
+SSCException                  # Basic custom error
+├── CSVReaderException        # Error while reading file         
+│   ├── DataInvalidFormat     # Error in data format from .csv file  
+│   └── FileInvalidFormat     # Critical file reading error (wrong extension, etc.)
+├── CheckerException          # More warning than error (no access to IP address, TCP or HTTPS ports closed, etc.)
+└── InternetConnectionError   # Internet connection error
 ```
