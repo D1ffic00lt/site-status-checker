@@ -307,6 +307,7 @@ class Controller(object):
                             host_name=host_display_name,
                             host_ip=ip,
                             ping=5000 if host_ping is None else host_ping,
+                            port=port,
                             port_status="Opened" if self.check_port(ip, port) else "Not opened",
                             status=len(host_ip) > 1
                         )
