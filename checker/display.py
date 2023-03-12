@@ -20,9 +20,9 @@ DEALINGS IN THE SOFTWARE.
 """
 import os
 import sys
-import warnings
 import schedule
-import logging
+
+from datetime import datetime
 
 from checker.config import *
 from checker.sitestatuschecker import SiteStatusChecker
@@ -36,9 +36,6 @@ class Display(object):
     r"""
     Class for passing data to the console and for periodically starting workers
 
-    setup_logging() -> None
-        The function is called when the class is initialized,
-        it is intended for setting up the logging module and ignoring warnings
     get_file_name() -> None
         A function to get the file name and to initialize the worker
     create_schedule() -> None
@@ -53,24 +50,7 @@ class Display(object):
     def __init__(self) -> None:
         self.worker = None
         self.ignore_errors = False
-        self.setup_logging()
         self.get_file_name()
-
-    @staticmethod
-    def setup_logging() -> None:
-        r"""
-        The function is called when the class is initialized,
-        it is intended for setting up the logging module and ignoring warnings
-
-        :return: None
-        """
-        logging.basicConfig(format=FORMAT, datefmt=DATE_FORMAT, level=logging.INFO)
-        handler = logging.FileHandler(LOG_PATH, mode='+a')
-        handler.setFormatter(logging.Formatter(FORMAT))
-        logging.getLogger().addHandler(handler)
-        logging.info("Start logging")
-        warnings.filterwarnings("ignore")
-        logging.info("Set filterwarnings ignore")
 
     def get_file_name(self) -> None:
         r"""
@@ -78,25 +58,22 @@ class Display(object):
 
         :return: None
         """
-        logging.info("Enter filename (csv): ")
-        filename = input()
+        filename = input(f"{self.get_time()} [INFO]: Enter filename (csv): ")
         if not os.path.exists(filename):
-            logging.info("File is not exists")
+            print(f"{self.get_time()} [ERROR]: File is not exists")
             self.get_file_name()
             return
-        logging.info("Ignore errors in csv? (Y/N): ")
-        self.ignore_errors = True if input().lower() == "y" else False
+        self.ignore_errors = True if input(f"{self.get_time()} [INFO]: Ignore errors in csv? (Y/N): ").lower() == "y" else False
         print_errors = False
         if self.ignore_errors:
-            logging.info("Print errors? (Y/N): ")
-            print_errors = True if input().lower() == "y" else False
+            print_errors = True if input(f"{self.get_time()} [INFO]: Print errors? (Y/N): ").lower() == "y" else False
 
         worker = SiteStatusChecker(filename)
         worker.IGNORE_ERRORS = self.ignore_errors
         worker.YIELD_ERRORS = print_errors
 
         self.worker = worker
-        logging.info("Worker created")
+        print(f"{self.get_time()} [INFO]: Worker created")
 
     def create_schedule(self) -> None:
         r"""
@@ -110,13 +87,17 @@ class Display(object):
         while True:
             schedule.run_pending()
 
-    def show(self) -> None:
+    @staticmethod
+    def get_time():
+        return datetime.now().strftime(DATE_FORMAT)
+
+    def show(self) -> None:  # there was logging but requests warnings killed it:(
         r"""
         Calls one iteration of the worker
 
         :return: None
         """
-        logging.info("Check starting...")
+        print(f"{self.get_time()} [INFO]: Check starting...")
         for i in self.worker():
             if isinstance(i, list):
                 for j in i:
@@ -126,18 +107,18 @@ class Display(object):
 
             if i is not None:
                 self.__send(i)
-        logging.info("Check completed!")
+        print(f"{self.get_time()} [INFO]: Check completed!")
 
     def __send(self, value) -> None:
         if isinstance(value, DataInvalidFormat):
-            logging.error(value)
+            print(f"{self.get_time()} [ERROR]:", value)
             if not self.ignore_errors:
                 sys.exit(1)
-            logging.info("continue...")
+            print(f"{self.get_time()} [INFO]: continue...")
         elif isinstance(value, FileInvalidFormat):
-            logging.critical(value)
+            print(f"{self.get_time()} [CRITICAL]:", value)
             sys.exit(1)
         elif isinstance(value, SSCException):
-            logging.warning(value)
+            print(f"{self.get_time()} [WARNING]:", value)
         else:
-            logging.info(value)
+            print(f"{self.get_time()} [INFO]:", value)
