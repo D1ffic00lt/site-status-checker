@@ -37,7 +37,7 @@ The script checks for the presence of docker on the computer and, depending on t
 > - Build and run the docker image
 > - Installing all the necessary libraries from the requirements.txt, running the app.py python script
 
-The entire code of the script can be found [run.sh](here)
+The entire code of the script can be found [here](run.sh)
 
 ### Docker
 [Docker](https://www.docker.com)  is an open platform for developing, delivering and operating applications. Docker is designed to get your applications up and running faster. With Docker, you can decouple your application from your infrastructure and treat your infrastructure as a managed application. Docker helps you deploy your code faster, test faster, deploy applications faster, and reduce the time between coding and running code. Docker does this with a lightweight container virtualization platform, using processes and utilities to help manage and host your applications.
