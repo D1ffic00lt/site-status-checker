@@ -4,6 +4,30 @@
 ## Task
 > Deployment of a small Python application so that it can be reserved for you in </br> case any of the sites is unavailable due to some random situation.
 
+## Project structure 
+```
+.
+├── checker
+│   ├── units             
+│   │   ├── __init__.py        
+│   │   ├── config.py         
+│   │   ├── controller.py
+│   │   ├── exceptions.py
+│   │   ├── exceptions.py
+│   │   └── reader.py
+│   ├── __init__.py
+│   ├── display.py
+│   └── sitestatuschecker.py 
+├── app.py
+├── Dockerfile
+├── run.sh
+├── requirements.txt
+├── README.md
+├── LICENCE.md
+├── .dockerignore
+└── .gitignore
+```
+
 ## Files and directories
 
 | Name                                                       | Description                                                                                                                                           |
@@ -69,3 +93,14 @@ pip3 install -r requirements.txt
 python3 app.py
 ```
 3. Everything is ready to use!
+
+## Exceptions
+
+```
+SSCException
+├── CSVReaderException             
+│   ├── DataInvalidFormat     
+│   └── FileInvalidFormat
+├── CheckerException
+└── InternetConnectionError
+```
