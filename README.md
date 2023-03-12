@@ -123,11 +123,11 @@ SSCException                  # Basic custom error
 [2023-03-12 18:13:02] [INFO]: Check starting...
 [2023-03-12 18:13:02] [ERROR]: host must be not None
 [2023-03-12 18:13:02] [INFO]: continue...
-[2023-03-12 18:13:04] [INFO]: host: localhost	|	ip: 127.0.0.1	|	RTT: 0.102 ms	|	port: ???	|	multy ip: False
+[2023-03-12 18:13:04] [INFO]: host: localhost	|	ip: 127.0.0.1	    |	RTT: 0.102 ms	  |	port: ???	|	multy ip: False
 [2023-03-12 18:13:09] [INFO]: host: yandex.ru	|	ip: 5.255.255.50	|	RTT: 51.219 ms	|	port: ???	|	multy ip: Opened
 [2023-03-12 18:13:09] [INFO]: host: yandex.ru	|	ip: 5.255.255.55	|	RTT: 51.934 ms	|	port: ???	|	multy ip: Opened
-[2023-03-12 18:13:09] [INFO]: host: yandex.ru	|	ip: 77.88.55.66	|	RTT: 53.820 ms	|	port: ???	|	multy ip: Opened
-[2023-03-12 18:13:09] [INFO]: host: yandex.ru	|	ip: 77.88.55.70	|	RTT: 49.834 ms	|	port: ???	|	multy ip: Opened
+[2023-03-12 18:13:09] [INFO]: host: yandex.ru	|	ip: 77.88.55.66	  |	RTT: 53.820 ms	|	port: ???	|	multy ip: Opened
+[2023-03-12 18:13:09] [INFO]: host: yandex.ru	|	ip: 77.88.55.70	  |	RTT: 49.834 ms	|	port: ???	|	multy ip: Opened
 [2023-03-12 18:13:10] [WARNING]: ip is not success (last.fm)
 [2023-03-12 18:13:13] [WARNING]: ip is not success (140.82.112.3)
 [2023-03-12 18:13:15] [WARNING]: cant get host name by address
