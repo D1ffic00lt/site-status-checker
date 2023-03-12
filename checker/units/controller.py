@@ -25,7 +25,7 @@ import urllib.error
 import urllib.request
 
 from ping3 import ping
-from typing import Union
+from typing import Union, Any
 
 from checker.units.exceptions import (
     IgnoreInternetExceptions, CheckerException, InternetConnectionError, SSCException
@@ -37,6 +37,26 @@ from checker.config import headers
 __all__ = ("Controller", )
 
 class Controller(object):
+    r"""
+    A class that conducts all the necessary checks for a single site
+
+    get_correct_url(url: str) -> str
+        The function for getting the correct type of link (http://url/)
+    get_ip_success(ip: str) -> bool
+        The function that checks the availability of the ip address of the site
+    get_status_code(url: str) -> int
+        The function that returns a code after a get request to the site
+    check_port(host: str, port: int) -> bool
+        The function checking port availability (closed or open)
+    get_ip_from_host(host: str) -> Union[set, bool]
+        The function that gets an IP address from a domain name
+    get_host_from_ip(host: str) -> Union[bool, socket.gethostbyaddr]
+        The function that gets a domain name by IP address
+    check_domains(self, host: str, ports: Union[int, list]) -> Any
+        The function that conducts all basic checks for the site
+    __call__(self) -> Any
+        The method performs all necessary checks for the site and returns
+    """
     __slots__ = (
         "target",
     )
@@ -46,12 +66,36 @@ class Controller(object):
     @staticmethod
     @IgnoreInternetExceptions()
     def get_correct_url(url: str) -> str:
+        r"""
+        The function for getting the correct type of link (http://url/)
+
+        Parameters
+        ------------
+            url: str
+                Link to format
+
+        Returns
+        --------
+            Formatted link (str)
+        """
         if "http://" in url or "https://" in url:
             return url
         return "http://" + url
 
     @IgnoreInternetExceptions(check_ip=True)
-    def get_ip_success(self, ip: str) -> str:
+    def get_ip_success(self, ip: str) -> bool:
+        r"""
+        The function that checks the availability of the ip address of the site
+
+        Parameters
+        ------------
+            ip: str
+                IP address to check
+
+        Returns
+        --------
+            Returns the availability status of an ip address (str)
+        """
         try:
             requests.get(
                 self.get_correct_url(ip), timeout=10,
@@ -63,6 +107,18 @@ class Controller(object):
 
     @IgnoreInternetExceptions()
     def get_status_code(self, url: str) -> int:
+        r"""
+        The function that returns a code after a get request to the site
+
+        Parameters
+        ------------
+            url: str
+                Link to get response status code
+
+        Returns
+        --------
+            Response status code (int)
+        """
         try:
             conn = urllib.request.urlopen(
                self.get_correct_url(url), timeout=10
@@ -76,6 +132,20 @@ class Controller(object):
     @staticmethod
     @IgnoreInternetExceptions()
     def check_port(host: str, port: int) -> bool:
+        r"""
+        The function checking port availability (closed or open)
+
+        Parameters
+        ------------
+            host: str
+                Domain name needed to check the port
+            port: str
+                port to check (closed or open)
+
+        Returns
+        ------------
+            Port availability (closed or open) (bool)
+        """
         socket_connection = socket.socket()
         socket_connection.settimeout(10)
         try:
@@ -87,6 +157,20 @@ class Controller(object):
     @staticmethod
     @IgnoreInternetExceptions()
     def get_ip_from_host(host: str) -> Union[set, bool]:
+        r"""
+        The function that gets an IP address from a domain name
+
+        Parameters
+        ------------
+            host: str
+                Domain name to be expanded into one or more IP addresses
+
+        Returns
+        ------------
+            One or more IP addresses or False
+            (if it was not possible to get the IP address)
+            (Union[set, bool])
+        """
         try:
             data = []
             for i in socket.getaddrinfo(host, 80):
@@ -98,12 +182,39 @@ class Controller(object):
     @staticmethod
     @IgnoreInternetExceptions()
     def get_host_from_ip(host: str) -> Union[bool, socket.gethostbyaddr]:
+        r"""
+        The function that gets a domain name by IP address
+
+        Parameters
+        ------------
+            host: str
+                IP address to be expanded into a domain name
+
+        Returns
+        ------------
+            Returns the domain name if possible, false otherwise (Union[bool, socket.gethostbyaddr])
+        """
         try:
             return socket.gethostbyaddr(host)
         except socket.gaierror:
             return False
 
-    def check_domains(self, host, ports):
+    def check_domains(self, host: str, ports: Union[int, list]) -> Any:
+        r"""
+        The function that conducts all basic checks for the site
+
+        Parameters
+        ------------
+            host: str
+                Domain name or IP address for which you want to
+                perform all the necessary checks for errors
+            ports: Union[int, list]
+                Port or ports to check for errors
+
+        Returns
+        ------------
+            Error class with message or status IP or domain name (Any)
+        """
         is_ip = re.findall(IP, host) != []
 
         if is_ip and "127.0.0.1" not in host:
@@ -140,10 +251,14 @@ class Controller(object):
         return is_ip
 
     @IgnoreInternetExceptions()
-    def __call__(self) -> Union[
-        InternetConnectionError, CheckerException,
-        set, dict[str, Union[str, float]], list[dict], str
-    ]:
+    def __call__(self) -> Any:
+        r"""
+        The method performs all necessary checks for the site and returns
+
+        Returns
+        ------------
+            The method returns the result of the check for one site (Any)
+        """
         if self.target.host is None:
             return
         is_ip = self.check_domains(self.target.host, self.target.ports)
