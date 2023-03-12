@@ -98,7 +98,7 @@ class Controller(object):
         """
         try:
             requests.get(
-                self.get_correct_url(ip), timeout=10,
+                self.get_correct_url(ip), timeout=5,
                 headers=headers
             )
         except requests.exceptions.Timeout:
@@ -121,7 +121,7 @@ class Controller(object):
         """
         try:
             conn = urllib.request.urlopen(
-               self.get_correct_url(url), timeout=10
+               self.get_correct_url(url), timeout=5
             )
         except urllib.error.HTTPError as ex:
             conn = ex
@@ -147,7 +147,7 @@ class Controller(object):
             Port availability (closed or open) (bool)
         """
         socket_connection = socket.socket()
-        socket_connection.settimeout(10)
+        socket_connection.settimeout(5)
         try:
             socket_connection.connect((host, port))
         except (socket.gaierror, socket.timeout, ConnectionRefusedError, TimeoutError):
@@ -179,9 +179,8 @@ class Controller(object):
         except socket.gaierror:
             return False
 
-    @staticmethod
     @IgnoreInternetExceptions()
-    def get_host_from_ip(host: str) -> Union[bool, socket.gethostbyaddr]:
+    def get_host_from_ip(self, host: str) -> Union[bool, socket.gethostbyaddr]:
         r"""
         The function that gets a domain name by IP address
 
@@ -196,7 +195,7 @@ class Controller(object):
         """
         try:
             return socket.gethostbyaddr(host)
-        except socket.gaierror:
+        except (socket.gaierror, socket.herror):
             return False
 
     def check_domains(self, host: str, ports: Union[int, list]) -> Any:
@@ -275,10 +274,11 @@ class Controller(object):
         host_ip = list(filter(lambda x: len(re.findall(IP, x)) == 1, host_ip))
 
         if self.target.host in ["127.0.0.1", "localhost"]:
+            host_ping = ping(host_ip[0], timeout=5, unit="ms")
             return dict(
                 host_name="localhost",
                 host_ip="127.0.0.1",
-                ping=ping(host_ip[0], timeout=500, unit="ms"),
+                ping=5000 if host_ping is None else host_ping,
                 status=len(host_ip) > 1
             )
 
@@ -286,11 +286,12 @@ class Controller(object):
             result = []
 
             for ip in host_ip:
+                host_ping = ping(ip, timeout=5, unit="ms")
                 result.append(
                     dict(
                         host_name=host_display_name,
                         host_ip=ip,
-                        ping=ping(ip, timeout=500, unit="ms"),
+                        ping=5000 if host_ping is None else host_ping,
                         status=len(host_ip) > 1
                     )
                 )
@@ -300,11 +301,12 @@ class Controller(object):
 
             for ip in host_ip:
                 for port in self.target.ports:
+                    host_ping = ping(ip, timeout=5, unit="ms")
                     result.append(
                         dict(
                             host_name=host_display_name,
                             host_ip=ip,
-                            ping=ping(ip, timeout=500, unit="ms"), port=port,
+                            ping=5000 if host_ping is None else host_ping,
                             port_status="Opened" if self.check_port(ip, port) else "Not opened",
                             status=len(host_ip) > 1
                         )

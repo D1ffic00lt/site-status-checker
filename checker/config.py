@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 FORMAT = '[%(asctime)s] [%(levelname)s]: %(message)s'
-DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+DATE_FORMAT = "[%Y-%m-%d %H:%M:%S]"
 LOG_PATH = "logs.log"
 
 IP = r"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]" \
