@@ -31,6 +31,14 @@ __all__ = (
 )
 
 class ReadObject(object):
+    r"""
+    A single site-object for which checks will be carried out
+
+    host: str
+        Website host (IP or domain name)
+    ports: list[int]
+        Site port or ports
+    """
     __slots__ = (
         "host", "_ports", "_results"
     )
@@ -56,6 +64,19 @@ class ReadObject(object):
 
 
 class CSVReader(object):
+    """
+    Class for reading and processing data from a .csv file
+
+    get_file_exists_status() -> bool
+        Checks for the existence of a .csv file
+    read() -> list[ReadObject]
+        Reads .csv file and performs necessary checks
+    __call__(self) -> Generator
+        Returns a generator from ReadObject objects
+    """
+    __slots__ = (
+        "filename", "input_error_status", "units"
+    )
     def __init__(self, filename: str) -> None:
         self.filename = filename
         self.input_error_status = False
@@ -63,9 +84,23 @@ class CSVReader(object):
         self.units = self.read()
 
     def get_file_exists_status(self) -> bool:
+        r"""
+        Checks for the existence of a .csv file
+
+        Returns
+        --------
+           Returns the presence status of a file
+        """
         return os.path.isfile(self.filename)
 
     def read(self) -> list[ReadObject]:
+        r"""
+        Reads .csv file and performs necessary checks
+
+        Returns
+        --------
+           List of sites from .csv file (list[ReadObject])
+        """
         if not self.get_file_exists_status():
             self.input_error_status = FileInvalidFormat("file {0} not found".format(self.filename))
             return []
@@ -113,4 +148,11 @@ class CSVReader(object):
         return "[{0}]".format(", ".join([repr(obj) for obj in self.units]))
 
     def __call__(self) -> Generator:
+        r"""
+        Returns a generator from ReadObject objects
+
+        Returns
+        --------
+           A generator from ReadObject objects
+        """
         yield from self.units
