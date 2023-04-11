@@ -82,7 +82,7 @@ At its core, Docker allows you to run almost any application safely isolated in 
 2. run docker (it is important that it starts completely)
 3. Enter the command in the console
 ```bash
-docker build --no-cache -t sitestatuschecker . && run -it sitestatuschecker
+docker build --no-cache -t sitestatuschecker . && docker run -it sitestatuschecker
 ```
 4. Wait for the end of the program build
 5. Everything is ready to use!
