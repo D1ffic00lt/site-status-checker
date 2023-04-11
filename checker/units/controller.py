@@ -54,6 +54,8 @@ class Controller(object):
         The function that gets a domain name by IP address
     check_domains(self, host: str, ports: Union[int, list]) -> Any
         The function that conducts all basic checks for the site
+    check_ssl(self, host: str) -> bool
+        The function checks for the presence (relevance) of the site's ssl certificates
     __call__(self) -> Any
         The method performs all necessary checks for the site and returns
     """
@@ -198,6 +200,31 @@ class Controller(object):
         except (socket.gaierror, socket.herror):
             return False
 
+    @IgnoreInternetExceptions()
+    def check_ssl(self, host: str) -> bool:
+        r"""
+        The function checks for the presence (relevance) of the site's ssl certificates
+
+        Parameters
+        ------------
+            host: str
+                Link to get ssl status
+
+        Returns
+        --------
+            ssl status (bool)
+        """
+        if "https://" not in host:
+            if "http://" in host:
+                host = "https://" + host[7:]
+            else:
+                host = "https://" + host
+        try:
+            requests.get(host, timeout=5, headers=headers)
+            return True
+        except requests.exceptions.SSLError:
+            return False
+
     def check_domains(self, host: str, ports: Union[int, list]) -> Any:
         r"""
         The function that conducts all basic checks for the site
@@ -302,16 +329,17 @@ class Controller(object):
             for ip in host_ip:
                 for port in self.target.ports:
                     host_ping = ping(ip, timeout=5, unit="ms")
-                    result.append(
-                        dict(
+                    check_result = dict(
                             host_name=host_display_name,
                             host_ip=ip,
                             ping=5000 if host_ping is None else host_ping,
                             port=port,
                             port_status="Opened" if self.check_port(ip, port) else "Not opened",
-                            status=len(host_ip) > 1
+                            status=len(host_ip) > 1,
                         )
-                    )
+                    if port == 443:
+                        check_result["ssl"] = "valid cert" if self.check_ssl(self.target.host) else "INVALID cert"
+                    result.append(check_result)
             return result
 
     def __repr__(self) -> str:
