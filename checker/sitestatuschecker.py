@@ -102,6 +102,13 @@ class SiteStatusChecker(CSVReader):
                             *output.values()
                         )
                     )
+                elif "ssl" in output.keys():
+                    result.append(
+                        "host: {0}\t|\tip: {1}\t|\tRTT: {2:.3f} ms\t|\tport: {3}\t"
+                        "|\tstatus: {4}\t|\tmulty ip: {5}\t|\tssl: {6}".format(
+                            *output.values()
+                        )
+                    )
                 else:
                     result.append(
                         "host: {0}\t|\tip: {1}\t|\tRTT: {2:.3f} ms\t|\tport: ???\t|\tmulty ip: {3}".format(

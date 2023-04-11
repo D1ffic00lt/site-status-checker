@@ -123,13 +123,15 @@ SSCException                  # Basic custom error
 [2023-03-12 18:13:02] [INFO]: Check starting...
 [2023-03-12 18:13:02] [ERROR]: host must be not None
 [2023-03-12 18:13:02] [INFO]: continue...
-[2023-03-12 18:13:04] [INFO]: host: localhost	|	ip: 127.0.0.1	    |	RTT: 0.102 ms	  |	port: ???	|	multy ip: False
-[2023-03-12 18:13:09] [INFO]: host: yandex.ru	|	ip: 5.255.255.50	|	RTT: 51.219 ms	|	port: ???	|	multy ip: True
-[2023-03-12 18:13:09] [INFO]: host: yandex.ru	|	ip: 5.255.255.55	|	RTT: 51.934 ms	|	port: ???	|	multy ip: True
-[2023-03-12 18:13:09] [INFO]: host: yandex.ru	|	ip: 77.88.55.66	  |	RTT: 53.820 ms	|	port: ???	|	multy ip: True
-[2023-03-12 18:13:09] [INFO]: host: yandex.ru	|	ip: 77.88.55.70	  |	RTT: 49.834 ms	|	port: ???	|	multy ip: True
-[2023-03-12 18:13:10] [WARNING]: ip is not success (last.fm)
-[2023-03-12 18:13:13] [WARNING]: ip is not success (140.82.112.3)
-[2023-03-12 18:13:15] [WARNING]: cant get host name by address
-[2023-03-12 18:13:15] [INFO]: Check completed!
+[2023-04-11 21:57:18] [INFO]: host: localhost	|	ip: 127.0.0.1	|	RTT: 0.285 ms	|	port: ???	|	multy ip: False
+[2023-04-11 21:57:26] [INFO]: host: yandex.ru	|	ip: 5.255.255.77	|	RTT: 50.284 ms	|	port: 443	|	status: Opened	|	multy ip: True	|	ssl: valid cert
+[2023-04-11 21:57:26] [INFO]: host: yandex.ru	|	ip: 77.88.55.60	|	RTT: 55.647 ms	|	port: 443	|	status: Opened	|	multy ip: True	|	ssl: valid cert
+[2023-04-11 21:57:26] [INFO]: host: yandex.ru	|	ip: 5.255.255.70	|	RTT: 54.540 ms	|	port: 443	|	status: Opened	|	multy ip: True	|	ssl: valid cert
+[2023-04-11 21:57:26] [INFO]: host: yandex.ru	|	ip: 77.88.55.88	|	RTT: 55.607 ms	|	port: 443	|	status: Opened	|	multy ip: True	|	ssl: valid cert
+[2023-04-11 21:57:32] [INFO]: host: last.fm	|	ip: 34.96.123.111	|	RTT: 66.948 ms	|	port: 80	|	status: Opened	|	multy ip: False
+[2023-04-11 21:57:32] [INFO]: host: last.fm	|	ip: 34.96.123.111	|	RTT: 68.951 ms	|	port: 443	|	status: Opened	|	multy ip: False	|	ssl: valid cert
+[2023-04-11 21:57:36] [WARNING]: ip is not success (140.82.112.3)
+[2023-04-11 21:57:38] [WARNING]: cant get host name by address
+[2023-04-11 21:57:43] [INFO]: host: d1ffic00lt.com	|	ip: 31.31.198.35	|	RTT: 46.597 ms	|	port: 443	|	status: Opened	|	multy ip: False	|	ssl: INVALID cert
+[2023-04-11 21:57:43] [INFO]: Check completed!
 ```
